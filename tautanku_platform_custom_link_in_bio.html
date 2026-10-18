@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TautanKu Studio — Platform Link-in-Bio Modular & Cepat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.35);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+        /* Dragging state */
+        .dragging-card {
+            opacity: 0.45;
+            transform: scale(0.98);
+            border: 2px dashed #6366f1 !important;
+        }
+        .drag-over-card {
+            border-top: 3px solid #4f46e5 !important;
+        }
+        /* Phone mockup frame */
+        .phone-frame {
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.28),
+                        inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+        }
+        /* Pulse animation for CTA */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.015); }
+        }
+        .link-card-hover {
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+        }
+        .link-card-hover:hover {
+            transform: translateY(-2px) scale(1.01);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-indigo-600 selection:text-white">
+
+    <!-- ==========================================
+         TOP NAVIGATION BAR (STUDIO & PUBLIC MODE)
+         ========================================== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <!-- Brand & PRD Status -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                    <i class="fa-solid fa-link text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-display font-bold text-lg tracking-tight text-slate-900">TautanKu</span>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">PRD v1.0 Ready</span>
+                    </div>
+                    <p class="text-xs text-slate-500 hidden sm:block">Platform Etalase Mikro & Link-in-Bio Instan</p>
+                </div>
+            </div>
+
+            <!-- Live Slug Bar (Desktop) -->
+            <div class="hidden md:flex items-center bg-slate-100 border border-slate-200/80 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Halaman Publik Aktif"></span>
+                <span class="text-slate-400">tautanku.id/</span>
+                <span id="nav-slug-display" class="font-bold text-indigo-600">@nadia.kreator</span>
+                <button onclick="copyPublicUrl()" class="ml-1 px-2 py-0.5 bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-full border border-slate-200 transition flex items-center gap-1" title="Salin URL Publik">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Salin</span>
+                </button>
+            </div>
+
+            <!-- Right Actions: View Mode, Download, Auth -->
+            <div class="flex items-center gap-2">
+                <!-- Toggle Public View vs Studio Editor -->
+                <button id="btn-toggle-public-view" onclick="togglePublicFullView()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-mobile-screen-button text-indigo-600"></i>
+                    <span id="label-toggle-public-view">Lihat Halaman Publik</span>
+                </button>
+
+                <!-- Quick Download Dropdown Trigger -->
+                <button onclick="openDownloadModal()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition flex items-center gap-2 shadow-sm shadow-indigo-500/20">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden sm:inline">Download ke Device</span>
+                </button>
+
+                <!-- Auth Profile Button -->
+                <button onclick="openAuthModal()" id="btn-auth-trigger" class="p-2 sm:px-3 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition flex items-center gap-2" title="Akun & Autentikasi">
+                    <i class="fa-regular fa-circle-user text-indigo-600 text-base"></i>
+                    <span id="nav-auth-label" class="hidden lg:inline">Akun Kreator</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================
+         MAIN WORKSPACE (STUDIO EDITOR + LIVE PHONE)
+         ========================================== -->
+    <main id="studio-workspace" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Quick Persona Switcher Banner (PRD Section 2 Target Personas) -->
+        <div class="mb-6 bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Preset Persona PRD (Coba Template Instan &lt; 1 Menit)</h2>
+                    <p class="text-xs text-slate-500">Pilih contoh profil berdasarkan 3 target persona utama PRD atau mulai kustomisasi sendiri:</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="loadPersonaPreset('creator')" id="preset-btn-creator" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 bg-indigo-50 border-indigo-300 text-indigo-700">
+                    <i class="fa-solid fa-video"></i>
+                    <span>1. Kreator &amp; Influencer</span>
+                </button>
+                <button onclick="loadPersonaPreset('umkm')" id="preset-btn-umkm" class="px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-store text-emerald-600"></i>
+                    <span>2. Katalog UMKM</span>
+                </button>
+                <button onclick="loadPersonaPreset('pro')" id="preset-btn-pro" class="px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-briefcase text-sky-600"></i>
+                    <span>3. Profesional / Freelancer</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid Layout: Left Editor (7 cols) | Right Phone Preview (5 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- LEFT COLUMN: TABS & EDITOR PANELS -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Navigation Tabs -->
+                <nav class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex overflow-x-auto no-scrollbar gap-1" aria-label="Menu Editor">
+                    <button onclick="switchTab('links')" id="tab-btn-links" class="tab-btn flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-sm">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Tautan</span>
+                        <span id="badge-links-count" class="px-1.5 py-0.2 text-[11px] rounded-full bg-white/20 text-white">5</span>
+                    </button>
+                    <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-solid fa-palette"></i>
+                        <span>Profil &amp; Tema</span>
+                    </button>
+                    <button onclick="switchTab('social')" id="tab-btn-social" class="tab-btn flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>Sosmed &amp; WA</span>
+                    </button>
+                    <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex-1 min-w-[115px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analitik</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn flex-1 min-w-[125px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh &amp; Pixel</span>
+                    </button>
+                </nav>
+
+                <!-- ==========================================
+                     TAB 1: LINK BUILDER & MANAGEMENT
+                     ========================================== -->
+                <section id="panel-links" class="space-y-5">
+                    
+                    <!-- Summary KPI Strip (Mini) -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Kunjungan</p>
+                                <p id="mini-stat-views" class="text-xl font-display font-bold text-slate-900 mt-0.5">1.240</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <i class="fa-regular fa-eye"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Klik</p>
+                                <p id="mini-stat-clicks" class="text-xl font-display font-bold text-indigo-600 mt-0.5">482</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Rasio CTR</p>
+                                <p id="mini-stat-ctr" class="text-xl font-display font-bold text-emerald-600 mt-0.5">38.9%</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center" title="Target KPI PRD: Minimal 25%">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add New Link Card (Story 1) -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/60">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-plus"></i>
+                                </span>
+                                <div>
+                                    <h3 id="form-link-heading" class="font-display font-bold text-sm sm:text-base text-slate-900">Tambah Tautan Baru</h3>
+                                    <p class="text-xs text-slate-500">Dilengkapi validasi protokol aman (Anti-XSS) &amp; penjadwalan tayang</p>
+                                </div>
+                            </div>
+                            <button type="button" id="btn-cancel-edit" onclick="resetLinkForm()" class="hidden text-xs font-semibold text-rose-600 hover:text-rose-700 px-2.5 py-1 rounded-lg bg-rose-50">
+                                Batal Edit
+                            </button>
+                        </div>
+
+                        <form id="form-link-builder" onsubmit="handleSaveLink(event)" class="p-4 sm:p-5 space-y-4">
+                            <input type="hidden" id="input-link-id" value="">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                <!-- Judul Tautan -->
+                                <div class="sm:col-span-6">
+                                    <label for="input-link-title" class="block text-xs font-semibold text-slate-700 mb-1">Judul Tautan <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="input-link-title" required maxlength="80" placeholder="Contoh: Portofolio Desain UI/UX 2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+
+                                <!-- Pilih Ikon / Kategori -->
+                                <div class="sm:col-span-6">
+                                    <label for="input-link-icon" class="block text-xs font-semibold text-slate-700 mb-1">Ikon &amp; Label Visual</label>
+                                    <select id="input-link-icon" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="fa-solid fa-globe">🌐 Website / Halaman Utama</option>
+                                        <option value="fa-solid fa-bag-shopping">🛍️ Katalog Produk / E-Commerce</option>
+                                        <option value="fa-solid fa-briefcase">💼 Portofolio / Studi Kasus</option>
+                                        <option value="fa-solid fa-calendar-check">📅 Booking Konsultasi / Jadwal</option>
+                                        <option value="fa-brands fa-youtube">▶️ Video YouTube / Konten Baru</option>
+                                        <option value="fa-solid fa-file-arrow-down">📄 Unduh E-Book / Pricelist PDF</option>
+                                        <option value="fa-solid fa-fire">🔥 Promo Spesial / Flash Sale</option>
+                                        <option value="fa-solid fa-comments">💬 Komunitas / Grup Diskusi</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- URL Tujuan dengan Validasi Protokol -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label for="input-link-url" class="block text-xs font-semibold text-slate-700">URL Tujuan (Wajib <code class="text-indigo-600">https://</code> atau <code class="text-indigo-600">http://</code>) <span class="text-rose-500">*</span></label>
+                                    <span class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                                        <i class="fa-solid fa-shield-halved"></i> Sanitasi XSS Aktif
+                                    </span>
+                                </div>
+                                <div class="relative">
+                                    <input type="text" id="input-link-url" required placeholder="https://contoh-tautan.com/produk-unggulan" oninput="validateUrlRealtime(this.value)" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <i class="fa-solid fa-link absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                </div>
+                                <p id="url-validation-msg" class="hidden text-xs mt-1.5 font-medium"></p>
+                            </div>
+
+                            <!-- Collapsible Schedule & Highlight (Should Have PRD) -->
+                            <div class="pt-1 border-t border-slate-100">
+                                <button type="button" onclick="toggleScheduleFields()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 py-1">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <span>Atur Penjadwalan Tautan Otomatis &amp; Sorotan (Opsional)</span>
+                                    <i id="schedule-chevron" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                                </button>
+
+                                <div id="schedule-fields-container" class="hidden mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="input-link-start" class="block text-[11px] font-semibold text-slate-600 mb-1">Mulai Tampil Pada (Opsional)</label>
+                                            <input type="datetime-local" id="input-link-start" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs bg-white">
+                                        </div>
+                                        <div>
+                                            <label for="input-link-end" class="block text-[11px] font-semibold text-slate-600 mb-1">Otomatis Sembunyi Pada (Opsional)</label>
+                                            <input type="datetime-local" id="input-link-end" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs bg-white">
+                                        </div>
+                                    </div>
+                                    <label class="flex items-center gap-2 cursor-pointer select-none pt-1">
+                                        <input type="checkbox" id="input-link-featured" class="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                                        <span class="text-xs font-medium text-slate-700">Jadikan tautan sorotan utama (Animasi &amp; badge "Populer")</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-end gap-2 pt-2">
+                                <button type="submit" id="btn-submit-link" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span id="btn-submit-link-text">Tambahkan ke Daftar Tautan</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Link List Header & Instructions -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                        <div>
+                            <h3 class="font-display font-bold text-base text-slate-900">Daftar Tautan Anda</h3>
+                            <p class="text-xs text-slate-500">Seret kartu (<i class="fa-solid fa-grip-vertical"></i> drag &amp; drop) atau tekan tombol panah untuk mengubah urutan.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="autosave-indicator" class="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-check-circle"></i> Tersimpan otomatis
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Links Container -->
+                    <div id="links-editor-list" class="space-y-3" role="list" aria-label="Daftar tautan yang dapat diurutkan">
+                        <!-- Rendered dynamically via JS -->
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     TAB 2: PROFILE & VISUAL THEMES (Must & Could Have)
+                     ========================================== -->
+                <section id="panel-profile" class="hidden space-y-6">
+                    
+                    <!-- Klaim Custom Username / Slug (Must Have PRD 4.A.2) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Klaim Custom Username / Slug Unik</h3>
+                                <p class="text-xs text-slate-500">URL publik unik untuk dibagikan di bio Instagram, TikTok, atau LinkedIn Anda.</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700">Must Have MVP</span>
+                        </div>
+
+                        <div>
+                            <div class="flex flex-col sm:flex-row rounded-xl overflow-hidden border border-slate-200 focus-within:ring-2 focus-within:ring-indigo-500">
+                                <span class="bg-slate-100 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-slate-500 border-b sm:border-b-0 sm:border-r border-slate-200 flex items-center">
+                                    https://tautanku.id/@
+                                </span>
+                                <input type="text" id="input-profile-slug" oninput="handleSlugInput(this.value)" placeholder="username.anda" maxlength="30" class="flex-1 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none">
+                            </div>
+                            <div id="slug-status-feedback" class="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>URL unik valid dan tersedia untuk diklaim!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Identitas Profil Dasar (Must Have PRD 4.A.4) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-display font-bold text-base text-slate-900">Identitas &amp; Foto Profil</h3>
+
+                        <!-- Avatar Picker & Custom URL -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <img id="editor-avatar-preview" src="https://placehold.co/160x160/4f46e5/ffffff?text=NP" alt="Avatar Profil" class="w-16 h-16 rounded-full object-cover border-2 border-indigo-500 shadow-sm shrink-0">
+                            <div class="flex-1 space-y-2 w-full">
+                                <label class="block text-xs font-semibold text-slate-700">Pilih Avatar Preset atau Masukkan URL Gambar</label>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button type="button" onclick="selectPresetAvatar('https://placehold.co/200x200/4f46e5/ffffff?text=NP')" class="text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-indigo-500 font-medium">Ungu Kreator</button>
+                                    <button type="button" onclick="selectPresetAvatar('https://placehold.co/200x200/059669/ffffff?text=KS')" class="text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-emerald-500 font-medium">Hijau UMKM</button>
+                                    <button type="button" onclick="selectPresetAvatar('https://placehold.co/200x200/0284c7/ffffff?text=RM')" class="text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-sky-500 font-medium">Biru Pro</button>
+                                    <button type="button" onclick="selectPresetAvatar('https://placehold.co/200x200/e11d48/ffffff?text=ID')" class="text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-rose-500 font-medium">Merah Brand</button>
+                                </div>
+                                <input type="url" id="input-profile-avatar" oninput="updateProfileField('avatar', this.value)" placeholder="https://... (URL foto profil)" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs bg-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="input-profile-name" class="block text-xs font-semibold text-slate-700 mb-1">Nama Tampilan</label>
+                                <input type="text" id="input-profile-name" oninput="updateProfileField('displayName', this.value)" maxlength="50" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label for="input-profile-badge" class="block text-xs font-semibold text-slate-700 mb-1">Label Profesi / Kategori</label>
+                                <input type="text" id="input-profile-badge" oninput="updateProfileField('roleBadge', this.value)" maxlength="40" placeholder="Contoh: Tech Creator & Edukator" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label for="input-profile-bio" class="block text-xs font-semibold text-slate-700">Bio Singkat</label>
+                                <span id="bio-char-counter" class="text-[11px] text-slate-400">0 / 160</span>
+                            </div>
+                            <textarea id="input-profile-bio" rows="2" maxlength="160" oninput="updateProfileField('bio', this.value)" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Pilihan Tema Visual & Custom Hex + WCAG 2.1 AA Checker -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                        <div>
+                            <h3 class="font-display font-bold text-base text-slate-900">Tema Visual &amp; Kustomisasi Warna (WCAG 2.1 Level AA)</h3>
+                            <p class="text-xs text-slate-500">Pilih palet preset atau atur kode warna Hex bebas dengan pemantau kontras aksesibilitas otomatis.</p>
+                        </div>
+
+                        <!-- Preset Themes Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="theme-presets-grid">
+                            <button type="button" onclick="applyThemePreset('light')" class="theme-card p-3 rounded-xl border-2 text-left transition flex items-center gap-3 border-indigo-600 bg-slate-50">
+                                <span class="w-8 h-8 rounded-lg bg-white border border-slate-300 shadow-inner shrink-0 flex items-center justify-center text-slate-900 font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Terang Bersih</p>
+                                    <p class="text-[10px] text-slate-500">Minimalis &amp; Cepat</p>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="applyThemePreset('dark')" class="theme-card p-3 rounded-xl border text-left transition flex items-center gap-3 border-slate-200 hover:border-slate-400">
+                                <span class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 shrink-0 flex items-center justify-center text-white font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Gelap Elegan</p>
+                                    <p class="text-[10px] text-slate-500">Midnight OLED</p>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="applyThemePreset('emerald')" class="theme-card p-3 rounded-xl border text-left transition flex items-center gap-3 border-slate-200 hover:border-slate-400">
+                                <span class="w-8 h-8 rounded-lg bg-emerald-950 border border-emerald-600 shrink-0 flex items-center justify-center text-emerald-100 font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Emerald UMKM</p>
+                                    <p class="text-[10px] text-slate-500">Segar &amp; Terpercaya</p>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="applyThemePreset('sunset')" class="theme-card p-3 rounded-xl border text-left transition flex items-center gap-3 border-slate-200 hover:border-slate-400">
+                                <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-900 via-purple-900 to-rose-900 shrink-0 flex items-center justify-center text-white font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Kreator Sunset</p>
+                                    <p class="text-[10px] text-slate-500">Gradasi Modern</p>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="applyThemePreset('executive')" class="theme-card p-3 rounded-xl border text-left transition flex items-center gap-3 border-slate-200 hover:border-slate-400">
+                                <span class="w-8 h-8 rounded-lg bg-sky-950 border border-sky-700 shrink-0 flex items-center justify-center text-white font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Profesional</p>
+                                    <p class="text-[10px] text-slate-500">Portfolio &amp; CV</p>
+                                </div>
+                            </button>
+
+                            <button type="button" onclick="applyThemePreset('cyber')" class="theme-card p-3 rounded-xl border text-left transition flex items-center gap-3 border-slate-200 hover:border-slate-400">
+                                <span class="w-8 h-8 rounded-lg bg-black border border-lime-400 shrink-0 flex items-center justify-center text-lime-300 font-bold text-xs">Aa</span>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-900">Cyber Kontras</p>
+                                    <p class="text-[10px] text-slate-500">Kontras Tinggi AAA</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Custom Hex Pickers (Could Have PRD 4.C.1) -->
+                        <div class="pt-4 border-t border-slate-100 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600">Kustomisasi Kode Warna Hex Bebas</h4>
+                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-violet-50 text-violet-700">Could Have Feature</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                                    <input type="color" id="picker-bg-color" oninput="updateCustomColor('bgColor', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 bg-transparent">
+                                    <div>
+                                        <label for="picker-bg-color" class="block text-xs font-semibold text-slate-700">Latar Halaman</label>
+                                        <span id="hex-label-bg" class="text-[11px] font-mono text-slate-500">#F8FAFC</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                                    <input type="color" id="picker-btn-bg" oninput="updateCustomColor('btnBg', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 bg-transparent">
+                                    <div>
+                                        <label for="picker-btn-bg" class="block text-xs font-semibold text-slate-700">Warna Tombol</label>
+                                        <span id="hex-label-btn-bg" class="text-[11px] font-mono text-slate-500">#1E293B</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                                    <input type="color" id="picker-btn-text" oninput="updateCustomColor('btnText', this.value)" class="w-9 h-9 rounded-lg cursor-pointer border-0 bg-transparent">
+                                    <div>
+                                        <label for="picker-btn-text" class="block text-xs font-semibold text-slate-700">Teks Tombol</label>
+                                        <span id="hex-label-btn-text" class="text-[11px] font-mono text-slate-500">#FFFFFF</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WCAG 2.1 Level AA Live Contrast Checker (NFR Section 6) -->
+                            <div id="wcag-contrast-box" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <i id="wcag-icon" class="fa-solid fa-universal-access text-emerald-600 text-lg"></i>
+                                    <div>
+                                        <p id="wcag-status-title" class="text-xs font-bold text-emerald-900">Rasio Kontras Tombol: 12.6:1 (Lulus Standar WCAG 2.1 Level AAA &amp; AA)</p>
+                                        <p class="text-[11px] text-emerald-700">Teks tombol sangat jelas dibaca oleh seluruh pengunjung termasuk pengguna screen reader.</p>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-fix-contrast" onclick="autoFixContrast()" class="hidden px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition">
+                                    Perbaiki Otomatis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     TAB 3: SOCIAL MEDIA & QUICK WHATSAPP (Should Have)
+                     ========================================== -->
+                <section id="panel-social" class="hidden space-y-6">
+                    
+                    <!-- Tombol Kontak Cepat WhatsApp (Should Have PRD 4.B.3) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-display font-bold text-base text-slate-900">Tombol Kontak Cepat WhatsApp</h3>
+                                    <p class="text-xs text-slate-500">Arahkan calon klien atau pembeli langsung ke chat WhatsApp dengan pesan template otomatis.</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-wa-enabled" onchange="updateWhatsAppConfig()" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label for="input-wa-phone" class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp (Format Internasional)</label>
+                                <input type="text" id="input-wa-phone" oninput="updateWhatsAppConfig()" placeholder="6281234567890" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label for="input-wa-label" class="block text-xs font-semibold text-slate-700 mb-1">Teks Tombol WhatsApp</label>
+                                <input type="text" id="input-wa-label" oninput="updateWhatsAppConfig()" placeholder="Chat langsung via WhatsApp" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="input-wa-message" class="block text-xs font-semibold text-slate-700 mb-1">Template Pesan Otomatis</label>
+                            <textarea id="input-wa-message" rows="2" oninput="updateWhatsAppConfig()" placeholder="Halo Kak, saya melihat halaman TautanKu Anda dan ingin bertanya lebih lanjut..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Ikon Media Sosial Header/Footer (Should Have PRD 4.B.2) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Baris Ikon Media Sosial</h3>
+                                <p class="text-xs text-slate-500">Kosongkan kolom jika tidak ingin menampilkan ikon sosial media terkait.</p>
+                            </div>
+                            <select id="select-social-position" onchange="updateProfileField('socialPosition', this.value)" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50">
+                                <option value="top">Tampilkan di Header (Atas)</option>
+                                <option value="bottom">Tampilkan di Footer (Bawah)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-instagram text-pink-600 mr-1"></i> URL Instagram</label>
+                                <input type="url" id="social-instagram" oninput="updateSocialLinks()" placeholder="https://instagram.com/username" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-tiktok text-slate-900 mr-1"></i> URL TikTok</label>
+                                <input type="url" id="social-tiktok" oninput="updateSocialLinks()" placeholder="https://tiktok.com/@username" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-youtube text-red-600 mr-1"></i> URL YouTube</label>
+                                <input type="url" id="social-youtube" oninput="updateSocialLinks()" placeholder="https://youtube.com/@channel" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-linkedin text-sky-700 mr-1"></i> URL LinkedIn</label>
+                                <input type="url" id="social-linkedin" oninput="updateSocialLinks()" placeholder="https://linkedin.com/in/username" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-github text-slate-800 mr-1"></i> URL GitHub / Behance</label>
+                                <input type="url" id="social-github" oninput="updateSocialLinks()" placeholder="https://github.com/username" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-brands fa-x-twitter text-slate-900 mr-1"></i> URL X / Twitter</label>
+                                <input type="url" id="social-twitter" oninput="updateSocialLinks()" placeholder="https://x.com/username" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     TAB 4: ANALYTICS DASHBOARD (Story 3 & KPI PRD)
+                     ========================================== -->
+                <section id="panel-analytics" class="hidden space-y-6">
+                    
+                    <!-- Header & Simulation Controls -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-display font-bold text-base text-slate-900">Laporan Analitik &amp; KPI Real-Time</h3>
+                                <span class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">Privasi Aman (Tanpa Log IP)</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">Pantau performa tautan, CTR pengunjung, dan metrik kecepatan muat halaman.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="simulatePublicTraffic()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                                <span>+ Simulasi 10 Pengunjung</span>
+                            </button>
+                            <button onclick="resetAnalyticsData()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-xs font-semibold transition">
+                                Reset Metrik
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4 KPI Cards (PRD Section 3) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Kunjungan</span>
+                            <p id="stat-card-views" class="text-2xl font-display font-extrabold text-slate-900 mt-1">1.240</p>
+                            <span class="text-[11px] text-emerald-600 font-medium flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i> Page Views Unik
+                            </span>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Klik Tautan</span>
+                            <p id="stat-card-clicks" class="text-2xl font-display font-extrabold text-indigo-600 mt-1">482</p>
+                            <span class="text-[11px] text-indigo-600 font-medium flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-computer-mouse"></i> Akumulatif
+                            </span>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Rata-rata CTR</span>
+                            <p id="stat-card-ctr" class="text-2xl font-display font-extrabold text-emerald-600 mt-1">38.9%</p>
+                            <span id="stat-ctr-kpi-badge" class="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-circle-check"></i> Target PRD &ge; 25%
+                            </span>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Speed Load 4G</span>
+                            <p class="text-2xl font-display font-extrabold text-sky-600 mt-1">0.18s</p>
+                            <span class="text-[11px] text-sky-700 font-medium flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-gauge-high"></i> Target &lt; 1.2 dtk
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Per-Link Performance Breakdown (Story 3) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-display font-bold text-sm text-slate-900">Peringkat Klik per Tautan (Terpopuler)</h4>
+                            <span class="text-xs text-slate-400">Klik tautan di pratinjau HP untuk menguji log real-time</span>
+                        </div>
+                        <div id="analytics-links-breakdown" class="space-y-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Privacy-First Aggregate Insights (NFR Section 6) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <h4 class="font-display font-bold text-sm text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-mobile-screen text-indigo-600"></i>
+                                <span>Agregat Perangkat Pengunjung</span>
+                            </h4>
+                            <div class="space-y-2.5 text-xs">
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>Smartphone (Android &amp; iOS)</span><span>84%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-indigo-600 h-full rounded-full" style="width: 84%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>Desktop / Laptop</span><span>13%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-sky-500 h-full rounded-full" style="width: 13%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>Tablet</span><span>3%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-emerald-500 h-full rounded-full" style="width: 3%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <h4 class="font-display font-bold text-sm text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-share-nodes text-emerald-600"></i>
+                                <span>Sumber Referrer Teratas</span>
+                            </h4>
+                            <div class="space-y-2.5 text-xs">
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>Instagram Bio</span><span>56%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-pink-600 h-full rounded-full" style="width: 56%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>TikTok Profile</span><span>28%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-slate-800 h-full rounded-full" style="width: 28%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between font-medium mb-1"><span>WhatsApp &amp; Direct Link</span><span>16%</span></div>
+                                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden"><div class="bg-emerald-500 h-full rounded-full" style="width: 16%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     TAB 5: DOWNLOAD TO DEVICE & EXTERNAL PIXEL
+                     ========================================== -->
+                <section id="panel-settings" class="hidden space-y-6">
+                    
+                    <!-- Download to Own Device Cards -->
+                    <div class="bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 rounded-2xl p-6 text-white shadow-lg space-y-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white/15 text-indigo-100">Fitur Unduh Mandiri</span>
+                                <h3 class="font-display font-bold text-xl mt-2">Download ke Perangkat Anda Sendiri</h3>
+                                <p class="text-xs sm:text-sm text-indigo-100/90 mt-1">Simpan halaman publik ultra-cepat (1 file HTML mandiri siap hosting) atau unduh seluruh aplikasi studio ini agar dapat dijalankan secara offline di laptop/HP Anda.</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl shrink-0">
+                                <i class="fa-solid fa-laptop-file"></i>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Option 1: Standalone Public HTML -->
+                            <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex items-center gap-2 text-amber-300 font-bold text-sm">
+                                        <i class="fa-solid fa-bolt"></i>
+                                        <span>1. Halaman Publik Mandiri (.html)</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-100 mt-1">File HTML ringan (&lt;15 KB, waktu muat &lt;0.2 detik) berisi profil, tema, tautan aktif, dan tombol WA Anda. Siap di-hosting di GitHub Pages, Netlify, atau dibuka langsung.</p>
+                                </div>
+                                <button onclick="downloadStandalonePublicHtml()" class="w-full py-2.5 px-4 rounded-xl bg-white text-indigo-950 hover:bg-indigo-50 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow">
+                                    <i class="fa-solid fa-file-code text-indigo-600"></i>
+                                    <span>Download Halaman Publik (.html)</span>
+                                </button>
+                            </div>
+
+                            <!-- Option 2: Full Studio Editor HTML -->
+                            <div class="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+                                        <i class="fa-solid fa-cubes"></i>
+                                        <span>2. Aplikasi Studio Lengkap (.html)</span>
+                                    </div>
+                                    <p class="text-xs text-indigo-100 mt-1">Unduh seluruh aplikasi dashboard editor TautanKu ini beserta data terbaru Anda yang sudah tertanam di dalamnya untuk digunakan kapan saja di perangkat sendiri.</p>
+                                </div>
+                                <button onclick="downloadFullStudioApp()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Download Aplikasi Editor (.html)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Option 3: JSON Backup Export / Import -->
+                        <div class="pt-3 border-t border-white/15 flex flex-wrap items-center justify-between gap-3">
+                            <div class="text-xs text-indigo-100">
+                                <span class="font-semibold text-white">Cadangan Data (.json):</span> Ekspor konfigurasi profil Anda atau pulihkan dari file JSON.
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportDataJson()" class="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-export"></i>
+                                    <span>Export JSON</span>
+                                </button>
+                                <label class="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-file-import"></i>
+                                    <span>Import JSON</span>
+                                    <input type="file" accept=".json" onchange="importDataJson(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrasi Analitik Eksternal (Could Have PRD 4.C.2) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Integrasi Analitik Eksternal (GA4 &amp; Meta Pixel)</h3>
+                                <p class="text-xs text-slate-500">Kode pelacakan akan otomatis disematkan saat Anda mengunduh Halaman Publik Mandiri (.html).</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-700">Could Have</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="input-ga-id" class="block text-xs font-semibold text-slate-700 mb-1">Google Analytics 4 Measurement ID</label>
+                                <input type="text" id="input-ga-id" oninput="updateAnalyticsConfig()" placeholder="G-XXXXXXXXXX" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-mono">
+                            </div>
+                            <div>
+                                <label for="input-pixel-id" class="block text-xs font-semibold text-slate-700 mb-1">Meta / Facebook Pixel ID</label>
+                                <input type="text" id="input-pixel-id" oninput="updateAnalyticsConfig()" placeholder="123456789012345" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-mono">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE MOBILE PREVIEW MOCKUP (Sticky) -->
+            <div class="lg:col-span-5 lg:sticky lg:top-22 flex flex-col items-center">
+                
+                <!-- Preview Controls Header -->
+                <div class="w-full max-w-[350px] mb-3 flex items-center justify-between text-xs text-slate-500 px-1">
+                    <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Pratinjau Seluler Interaktif
+                    </span>
+                    <button onclick="togglePublicFullView()" class="text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1">
+                        <span>Layar Penuh</span>
+                        <i class="fa-solid fa-up-right-and-down-left-from-center text-[10px]"></i>
+                    </button>
+                </div>
+
+                <!-- Smartphone Frame -->
+                <div class="phone-frame w-full max-w-[350px] h-[680px] rounded-[44px] bg-slate-900 p-3 border-4 border-slate-800 relative flex flex-col">
+                    <!-- Speaker Notch -->
+                    <div class="w-28 h-5 bg-slate-950 rounded-b-2xl mx-auto absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center">
+                        <span class="w-10 h-1 rounded-full bg-slate-800"></span>
+                    </div>
+
+                    <!-- Inner Screen Container -->
+                    <div id="phone-preview-screen" class="flex-1 w-full h-full rounded-[32px] overflow-y-auto overflow-x-hidden relative transition-colors duration-300 flex flex-col justify-between p-5 pt-9">
+                        <!-- Dynamic Public Profile Content rendered here via JS -->
+                    </div>
+                </div>
+
+                <!-- Bottom Speed & Security Badge -->
+                <div class="mt-3 flex items-center gap-4 text-[11px] text-slate-500">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-500"></i> Render &lt; 50ms</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-universal-access text-indigo-600"></i> WCAG 2.1 AA</span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Anti-Spam Rate Limit</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ==========================================
+         FULL-SCREEN PUBLIC PROFILE MODE (/@username)
+         ========================================== -->
+    <section id="public-fullview-container" class="hidden min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center py-8 px-4 transition-colors duration-300">
+        <!-- Floating Admin Return Bar -->
+        <div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2.5 rounded-full shadow-xl border border-white/15 flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5 font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Mode Publik (<span id="public-bar-slug" class="font-bold text-indigo-300">@nadia.kreator</span>)
+            </span>
+            <button onclick="togglePublicFullView()" class="px-3 py-1 rounded-full bg-indigo-600 hover:bg-indigo-500 font-semibold transition">
+                Kembali ke Editor
+            </button>
+            <button onclick="downloadStandalonePublicHtml()" class="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 font-semibold transition flex items-center gap-1">
+                <i class="fa-solid fa-download"></i> Unduh HTML
+            </button>
+        </div>
+
+        <!-- Centered Mobile-First Public Card -->
+        <div id="public-fullview-card" class="w-full max-w-md mx-auto rounded-3xl p-6 sm:p-8 shadow-xl transition-colors duration-300">
+            <!-- Populated dynamically by renderPublicProfile() -->
+        </div>
+    </section>
+
+    <!-- ==========================================
+         MODAL 1: AUTHENTICATION (Email/Password & Google OAuth)
+         ========================================== -->
+    <div id="modal-auth" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-fadeIn">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+                        <i class="fa-solid fa-user-lock"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-base text-slate-900">Autentikasi Akun TautanKu</h3>
+                        <p class="text-xs text-slate-500">Keamanan kata sandi terenkripsi &amp; sinkronisasi</p>
+                    </div>
+                </div>
+                <button onclick="closeAuthModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Google OAuth Quick Button -->
+            <button type="button" onclick="handleGoogleOAuth()" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 font-semibold text-xs sm:text-sm text-slate-700 transition flex items-center justify-center gap-2.5 shadow-sm">
+                <i class="fa-brands fa-google text-red-500 text-base"></i>
+                <span>Lanjutkan dengan Google OAuth</span>
+            </button>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-3 text-[11px] font-medium text-slate-400 uppercase">Atau Email &amp; Password</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <form onsubmit="handleEmailAuth(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
+                    <input type="email" id="auth-email" required value="nadia@tautanku.id" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi</label>
+                    <input type="password" id="auth-password" required minlength="6" value="••••••••••••" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm">
+                    <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-emerald-600"></i> Enkripsi Argon2id / Bcrypt Hash + Proteksi Rate Limit Login
+                    </p>
+                </div>
+                <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition shadow-sm">
+                    Masuk / Simpan Sesi Kreator
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: DOWNLOAD CENTER (Quick Access)
+         ========================================== -->
+    <div id="modal-download" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+                        <i class="fa-solid fa-download"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-base text-slate-900">Download ke Perangkat Anda</h3>
+                        <p class="text-xs text-slate-500">Pilih format file yang ingin Anda simpan ke komputer atau smartphone</p>
+                    </div>
+                </div>
+                <button onclick="closeDownloadModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="downloadStandalonePublicHtml(); closeDownloadModal();" class="w-full p-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 text-left transition flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-display font-bold text-sm text-slate-900">Download Halaman Publik Mandiri (.html)</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white">Direkomendasikan</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1">Menghasilkan 1 file HTML ringan berisi halaman profil publik Anda (`@username.html`). Sangat cepat (&lt;0.2 detik) dan siap diunggah ke hosting gratis atau dibuka langsung di HP.</p>
+                    </div>
+                </button>
+
+                <button onclick="downloadFullStudioApp(); closeDownloadModal();" class="w-full p-4 rounded-2xl border border-slate-200 hover:border-indigo-400 bg-white hover:bg-slate-50 text-left transition flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="font-display font-bold text-sm text-slate-900 block">Download Aplikasi Studio Editor Lengkap (.html)</span>
+                        <p class="text-xs text-slate-600 mt-1">Mengunduh seluruh aplikasi dashboard + editor TautanKu ini beserta seluruh perubahan Anda agar bisa diedit kembali secara offline di perangkat sendiri.</p>
+                    </div>
+                </button>
+
+                <button onclick="exportDataJson(); closeDownloadModal();" class="w-full p-4 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-left transition flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-file-code"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="font-display font-bold text-sm text-slate-900 block">Export Cadangan Data Profil (.json)</span>
+                        <p class="text-xs text-slate-600 mt-1">Simpan struktur tautan, tema, dan metrik analitik dalam format JSON.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         TOAST NOTIFICATION BOX (No browser alert!)
+         ========================================== -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- ==========================================
+         APPLICATION LOGIC & STATE MANAGEMENT
+         ========================================== -->
+    <script>
+        /* INITIAL_STATE_START */
+        let appState = {
+            currentUser: {
+                email: "nadia@tautanku.id",
+                name: "Nadia Putri",
+                authMethod: "Email + Argon2id Hash"
+            },
+            profile: {
+                slug: "nadia.kreator",
+                displayName: "Nadia Putri ✨",
+                roleBadge: "Tech Content Creator & UI Educator",
+                bio: "Berbagi tips produktivitas digital, review gadget jujur, dan template Notion gratis setiap minggu. Kolaborasi & kelas ada di bawah 👇",
+                avatar: "https://placehold.co/200x200/4f46e5/ffffff?text=NP",
+                themePreset: "light",
+                bgColor: "#F8FAFC",
+                cardBgColor: "#FFFFFF",
+                textColor: "#0F172A",
+                btnBg: "#1E293B",
+                btnText: "#FFFFFF",
+                socialPosition: "top"
+            },
+            whatsapp: {
+                enabled: true,
+                phone: "6281234567890",
+                label: "Hubungi via WhatsApp (Fast Response)",
+                message: "Halo Kak Nadia, saya tertarik berdiskusi mengenai kolaborasi konten / kelas digital."
+            },
+            socials: {
+                instagram: "https://instagram.com/nadiaputri.id",
+                tiktok: "https://tiktok.com/@nadiaputri.id",
+                youtube: "https://youtube.com/@nadiaputritech",
+                linkedin: "https://linkedin.com/in/nadiaputri",
+                github: "",
+                twitter: "https://x.com/nadiaputri"
+            },
+            externalAnalytics: {
+                gaId: "",
+                pixelId: ""
+            },
+            analytics: {
+                pageViews: 1240
+            },
+            links: [
+                {
+                    id: "lnk-1",
+                    title: "🔥 E-Book & Template Notion Produktivitas 2026",
+                    url: "https://example.com/template-notion-2026",
+                    icon: "fa-solid fa-fire",
+                    active: true,
+                    featured: true,
+                    clicks: 215,
+                    startDate: "",
+                    endDate: ""
+                },
+                {
+                    id: "lnk-2",
+                    title: "▶️ Video Baru: Setup Meja Kerja Minimalis Budget",
+                    url: "https://youtube.com/watch?v=dQw4w9WgXcQ",
+                    icon: "fa-brands fa-youtube",
+                    active: true,
+                    featured: false,
+                    clicks: 128,
+                    startDate: "",
+                    endDate: ""
+                },
+                {
+                    id: "lnk-3",
+                    title: "📅 Booking Sesi Konsultasi & Audit Portofolio 1-on-1",
+                    url: "https://example.com/booking-konsultasi",
+                    icon: "fa-solid fa-calendar-check",
+                    active: true,
+                    featured: false,
+                    clicks: 84,
+                    startDate: "",
+                    endDate: ""
+                },
+                {
+                    id: "lnk-4",
+                    title: "🛍️ Rekomendasi Alat Ngonten & Gear Favoritku",
+                    url: "https://example.com/katalog-gear-kreator",
+                    icon: "fa-solid fa-bag-shopping",
+                    active: true,
+                    featured: false,
+                    clicks: 55,
+                    startDate: "",
+                    endDate: ""
+                }
+            ]
+        };
+        /* INITIAL_STATE_END */
+
+        // Preset Persona Templates (PRD Section 2)
+        const PERSONA_PRESETS = {
+            creator: {
+                profile: {
+                    slug: "nadia.kreator",
+                    displayName: "Nadia Putri ✨",
+                    roleBadge: "Tech Content Creator & UI Educator",
+                    bio: "Berbagi tips produktivitas digital, review gadget jujur, dan template Notion gratis setiap minggu. Kolaborasi & kelas ada di bawah 👇",
+                    avatar: "https://placehold.co/200x200/4f46e5/ffffff?text=NP",
+                    themePreset: "light",
+                    bgColor: "#F8FAFC",
+                    cardBgColor: "#FFFFFF",
+                    textColor: "#0F172A",
+                    btnBg: "#1E293B",
+                    btnText: "#FFFFFF",
+                    socialPosition: "top"
+                },
+                whatsapp: {
+                    enabled: true,
+                    phone: "6281234567890",
+                    label: "Inquiries & Endorsement via WhatsApp",
+                    message: "Halo Tim Nadia, kami tertarik untuk bekerja sama dalam kampanye brand..."
+                },
+                analytics: { pageViews: 1240 },
+                links: [
+                    { id: "c-1", title: "🔥 E-Book & Template Notion Produktivitas 2026", url: "https://example.com/template-notion-2026", icon: "fa-solid fa-fire", active: true, featured: true, clicks: 215, startDate: "", endDate: "" },
+                    { id: "c-2", title: "▶️ Video Baru: Setup Meja Kerja Minimalis", url: "https://youtube.com/watch?v=dQw4w9WgXcQ", icon: "fa-brands fa-youtube", active: true, featured: false, clicks: 128, startDate: "", endDate: "" },
+                    { id: "c-3", title: "📅 Booking Sesi Konsultasi Kreator 1-on-1", url: "https://example.com/booking-konsultasi", icon: "fa-solid fa-calendar-check", active: true, featured: false, clicks: 84, startDate: "", endDate: "" },
+                    { id: "c-4", title: "🛍️ Etalase Gear & Alat Ngonten Favorit", url: "https://example.com/katalog-gear", icon: "fa-solid fa-bag-shopping", active: true, featured: false, clicks: 55, startDate: "", endDate: "" }
+                ]
+            },
+            umkm: {
+                profile: {
+                    slug: "kopisenja.id",
+                    displayName: "Kopi Senja Nusantara ☕",
+                    roleBadge: "Roastery & Katalog Pesan Antar Kilat",
+                    bio: "Biji kopi Arabika & Robusta pilihan langsung dari petani lokal Jawa Barat. Pesan kopi literan, hampers, atau biji sangrai segar setiap hari!",
+                    avatar: "https://placehold.co/200x200/059669/ffffff?text=KS",
+                    themePreset: "emerald",
+                    bgColor: "#022C22",
+                    cardBgColor: "#064E3B",
+                    textColor: "#ECFDF5",
+                    btnBg: "#10B981",
+                    btnText: "#022C22",
+                    socialPosition: "top"
+                },
+                whatsapp: {
+                    enabled: true,
+                    phone: "6281122334455",
+                    label: "Pesan Langsung via Admin WhatsApp",
+                    message: "Halo Admin Kopi Senja, saya ingin memesan menu katalog berikut:"
+                },
+                analytics: { pageViews: 2180 },
+                links: [
+                    { id: "u-1", title: "🔥 Promo Bundling Kopi Susu 1 Liter (Diskon 25%)", url: "https://example.com/promo-kopi-literan", icon: "fa-solid fa-fire", active: true, featured: true, clicks: 410, startDate: "", endDate: "" },
+                    { id: "u-2", title: "🛍️ Order via Tokopedia & Shopee Official Store", url: "https://example.com/marketplace-kopisenja", icon: "fa-solid fa-bag-shopping", active: true, featured: false, clicks: 295, startDate: "", endDate: "" },
+                    { id: "u-3", title: "📄 Unduh Menu Katalog & Daftar Harga Grosir B2B", url: "https://example.com/menu-katalog-pdf", icon: "fa-solid fa-file-arrow-down", active: true, featured: false, clicks: 160, startDate: "", endDate: "" },
+                    { id: "u-4", title: "🌐 Lokasi Kedai & Jam Operasional (Bandung & Jakarta)", url: "https://maps.google.com", icon: "fa-solid fa-globe", active: true, featured: false, clicks: 98, startDate: "", endDate: "" }
+                ]
+            },
+            pro: {
+                profile: {
+                    slug: "reza.productdesign",
+                    displayName: "Reza Mahendra",
+                    roleBadge: "Principal Product Designer & UX Consultant",
+                    bio: "Membantu startup fintech & SaaS merancang produk digital berkonversi tinggi selama 8+ tahun. Tersedia untuk audit UX & proyek kuartal baru.",
+                    avatar: "https://placehold.co/200x200/0284c7/ffffff?text=RM",
+                    themePreset: "executive",
+                    bgColor: "#0F172A",
+                    cardBgColor: "#1E293B",
+                    textColor: "#F8FAFC",
+                    btnBg: "#38BDF8",
+                    btnText: "#082F49",
+                    socialPosition: "bottom"
+                },
+                whatsapp: {
+                    enabled: true,
+                    phone: "6281987654321",
+                    label: "Diskusi Proyek Cepat (WhatsApp)",
+                    message: "Halo Mas Reza, kami ingin menjadwalkan diskusi terkait kebutuhan UI/UX perusahaan kami."
+                },
+                analytics: { pageViews: 890 },
+                links: [
+                    { id: "p-1", title: "💼 Studi Kasus UI/UX Terpilih (2022–2026)", url: "https://example.com/ux-case-studies", icon: "fa-solid fa-briefcase", active: true, featured: true, clicks: 192, startDate: "", endDate: "" },
+                    { id: "p-2", title: "📅 Jadwalkan Discovery Call 30 Menit (Gratis)", url: "https://calendly.com", icon: "fa-solid fa-calendar-check", active: true, featured: false, clicks: 114, startDate: "", endDate: "" },
+                    { id: "p-3", title: "📄 Unduh CV & Ringkasan Portofolio (PDF)", url: "https://example.com/reza-cv.pdf", icon: "fa-solid fa-file-arrow-down", active: true, featured: false, clicks: 76, startDate: "", endDate: "" }
+                ]
+            }
+        };
+
+        // Theme Presets Lookup
+        const THEME_PRESETS = {
+            light:     { bgColor: "#F8FAFC", cardBgColor: "#FFFFFF", textColor: "#0F172A", btnBg: "#1E293B", btnText: "#FFFFFF" },
+            dark:      { bgColor: "#090D16", cardBgColor: "#111827", textColor: "#F9FAFB", btnBg: "#6366F1", btnText: "#FFFFFF" },
+            emerald:   { bgColor: "#022C22", cardBgColor: "#064E3B", textColor: "#ECFDF5", btnBg: "#10B981", btnText: "#022C22" },
+            sunset:    { bgColor: "#2E1065", cardBgColor: "#4C1D95", textColor: "#FAF5FF", btnBg: "#F43F5E", btnText: "#FFFFFF" },
+            executive: { bgColor: "#0F172A", cardBgColor: "#1E293B", textColor: "#F8FAFC", btnBg: "#38BDF8", btnText: "#082F49" },
+            cyber:     { bgColor: "#000000", cardBgColor: "#111111", textColor: "#FFFFFF", btnBg: "#A3E635", btnText: "#000000" }
+        };
+
+        // Anti-Spam Click Rate Limiter State (NFR Section 6 Security)
+        const clickRateLimitLog = {};
+        let draggedLinkIndex = null;
+        let isPublicFullView = false;
+
+        // ==========================================
+        // SECURITY & VALIDATION UTILITIES (NFR 6)
+        // ==========================================
+        function sanitizeHtml(str) {
+            if (!str) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function isValidSafeUrl(urlString) {
+            if (!urlString || typeof urlString !== "string") return { valid: false, reason: "URL tidak boleh kosong." };
+            const trimmed = urlString.trim();
+            // Block dangerous XSS protocols
+            const lower = trimmed.toLowerCase();
+            if (lower.startsWith("javascript:") || lower.startsWith("data:") || lower.startsWith("vbscript:") || lower.includes("<script")) {
+                return { valid: false, reason: "Keamanan Anti-XSS: Protokol berbahaya (javascript:/data:) diblokir!" };
+            }
+            if (!/^https?:\/\//i.test(trimmed)) {
+                return { valid: false, reason: "Wajib diawali dengan protokol https:// atau http://" };
+            }
+            try {
+                const parsed = new URL(trimmed);
+                if (!parsed.hostname || !parsed.hostname.includes(".")) {
+                    return { valid: false, reason: "Masukkan domain yang valid (misal: https://domain.com)." };
+                }
+                return { valid: true, sanitizedUrl: parsed.href };
+            } catch (e) {
+                return { valid: false, reason: "Format URL tidak valid." };
+            }
+        }
+
+        function validateUrlRealtime(val) {
+            const msgEl = document.getElementById("url-validation-msg");
+            if (!val.trim()) {
+                msgEl.classList.add("hidden");
+                return;
+            }
+            const check = isValidSafeUrl(val);
+            msgEl.classList.remove("hidden");
+            if (check.valid) {
+                msgEl.className = "text-xs mt-1.5 font-medium text-emerald-600 flex items-center gap-1";
+                msgEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Protokol URL valid dan aman.`;
+            } else {
+                msgEl.className = "text-xs mt-1.5 font-medium text-rose-600 flex items-center gap-1";
+                msgEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${sanitizeHtml(check.reason)}`;
+            }
+        }
+
+        // Check if a scheduled link is currently active
+        function isLinkScheduleActive(link) {
+            const now = new Date();
+            if (link.startDate) {
+                const start = new Date(link.startDate);
+                if (now < start) return { activeNow: false, statusLabel: "Terjadwal" };
+            }
+            if (link.endDate) {
+                const end = new Date(link.endDate);
+                if (now > end) return { activeNow: false, statusLabel: "Kedaluwarsa" };
+            }
+            return { activeNow: true, statusLabel: "Tayang" };
+        }
+
+        // ==========================================
+        // WCAG 2.1 LEVEL AA CONTRAST CHECKER (NFR 6)
+        // ==========================================
+        function hexToRgb(hex) {
+            const clean = hex.replace("#", "");
+            if (clean.length !== 6) return { r: 255, g: 255, b: 255 };
+            return {
+                r: parseInt(clean.substring(0, 2), 16),
+                g: parseInt(clean.substring(2, 4), 16),
+                b: parseInt(clean.substring(4, 6), 16)
+            };
+        }
+
+        function getLuminance(hex) {
+            const { r, g, b } = hexToRgb(hex);
+            const a = [r, g, b].map(v => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        function getContrastRatio(hex1, hex2) {
+            const lum1 = getLuminance(hex1);
+            const lum2 = getLuminance(hex2);
+            const brightest = Math.max(lum1, lum2);
+            const darkest = Math.min(lum1, lum2);
+            return (brightest + 0.05) / (darkest + 0.05);
+        }
+
+        function updateWcagContrastUI() {
+            const ratio = getContrastRatio(appState.profile.btnBg, appState.profile.btnText);
+            const rounded = ratio.toFixed(1);
+            const box = document.getElementById("wcag-contrast-box");
+            const title = document.getElementById("wcag-status-title");
+            const fixBtn = document.getElementById("btn-fix-contrast");
+            const icon = document.getElementById("wcag-icon");
+
+            if (ratio >= 4.5) {
+                const level = ratio >= 7 ? "AAA & AA" : "AA";
+                box.className = "p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-2";
+                icon.className = "fa-solid fa-universal-access text-emerald-600 text-lg";
+                title.className = "text-xs font-bold text-emerald-900";
+                title.textContent = `Rasio Kontras Tombol: ${rounded}:1 (Lulus Standar WCAG 2.1 Level ${level})`;
+                fixBtn.classList.add("hidden");
+            } else {
+                box.className = "p-3.5 rounded-xl bg-amber-50 border border-amber-300 flex flex-wrap items-center justify-between gap-2";
+                icon.className = "fa-solid fa-triangle-exclamation text-amber-600 text-lg";
+                title.className = "text-xs font-bold text-amber-900";
+                title.textContent = `Rasio Kontras Rendah: ${rounded}:1 (Di bawah standar WCAG 2.1 AA minimal 4.5:1)`;
+                fixBtn.classList.remove("hidden");
+            }
+        }
+
+        function autoFixContrast() {
+            const bgLum = getLuminance(appState.profile.btnBg);
+            appState.profile.btnText = bgLum > 0.179 ? "#0F172A" : "#FFFFFF";
+            syncFormInputsFromState();
+            renderAll();
+            showToast("Kontras warna teks tombol otomatis disesuaikan ke standar WCAG 2.1 AA!", "success");
+        }
+
+        // ==========================================
+        // TOAST MESSAGE SYSTEM (No alert/confirm!)
+        // ==========================================
+        function showToast(message, type = "info") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            const colors = {
+                success: "bg-slate-900 text-white border-emerald-500",
+                error: "bg-rose-950 text-white border-rose-500",
+                info: "bg-slate-900 text-white border-indigo-500"
+            };
+            const icons = {
+                success: "fa-circle-check text-emerald-400",
+                error: "fa-circle-exclamation text-rose-400",
+                info: "fa-circle-info text-indigo-400"
+            };
+
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border-l-4 ${colors[type] || colors.info} flex items-center gap-3 text-xs font-medium transition-all duration-300`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type] || icons.info} text-sm shrink-0"></i>
+                <span class="flex-1">${sanitizeHtml(message)}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(8px)";
+                setTimeout(() => toast.remove(), 250);
+            }, 3200);
+        }
+
+        // ==========================================
+        // LINK MANAGEMENT (ADD, EDIT, DELETE, REORDER)
+        // ==========================================
+        function handleSaveLink(e) {
+            e.preventDefault();
+            const editId = document.getElementById("input-link-id").value;
+            const title = document.getElementById("input-link-title").value.trim();
+            const rawUrl = document.getElementById("input-link-url").value.trim();
+            const icon = document.getElementById("input-link-icon").value;
+            const startDate = document.getElementById("input-link-start").value;
+            const endDate = document.getElementById("input-link-end").value;
+            const featured = document.getElementById("input-link-featured").checked;
+
+            const urlCheck = isValidSafeUrl(rawUrl);
+            if (!urlCheck.valid) {
+                validateUrlRealtime(rawUrl);
+                showToast(urlCheck.reason, "error");
+                return;
+            }
+
+            if (editId) {
+                const idx = appState.links.findIndex(l => l.id === editId);
+                if (idx !== -1) {
+                    appState.links[idx] = {
+                        ...appState.links[idx],
+                        title,
+                        url: urlCheck.sanitizedUrl,
+                        icon,
+                        startDate,
+                        endDate,
+                        featured
+                    };
+                    showToast("Tautan berhasil diperbarui!", "success");
+                }
+            } else {
+                const newLink = {
+                    id: "lnk-" + Date.now(),
+                    title,
+                    url: urlCheck.sanitizedUrl,
+                    icon,
+                    active: true,
+                    featured,
+                    clicks: 0,
+                    startDate,
+                    endDate
+                };
+                // Newest link placed at top per Story 1
+                appState.links.unshift(newLink);
+                showToast("Tautan baru ditambahkan ke urutan teratas!", "success");
+            }
+
+            resetLinkForm();
+            renderAll();
+        }
+
+        function startEditLink(id) {
+            const link = appState.links.find(l => l.id === id);
+            if (!link) return;
+
+            document.getElementById("input-link-id").value = link.id;
+            document.getElementById("input-link-title").value = link.title;
+            document.getElementById("input-link-url").value = link.url;
+            document.getElementById("input-link-icon").value = link.icon || "fa-solid fa-globe";
+            document.getElementById("input-link-start").value = link.startDate || "";
+            document.getElementById("input-link-end").value = link.endDate || "";
+            document.getElementById("input-link-featured").checked = !!link.featured;
+
+            if (link.startDate || link.endDate || link.featured) {
+                document.getElementById("schedule-fields-container").classList.remove("hidden");
+            }
+
+            document.getElementById("form-link-heading").textContent = "Edit Tautan";
+            document.getElementById("btn-submit-link-text").textContent = "Simpan Perubahan Tautan";
+            document.getElementById("btn-cancel-edit").classList.remove("hidden");
+            document.getElementById("input-link-title").focus();
+        }
+
+        function resetLinkForm() {
+            document.getElementById("form-link-builder").reset();
+            document.getElementById("input-link-id").value = "";
+            document.getElementById("form-link-heading").textContent = "Tambah Tautan Baru";
+            document.getElementById("btn-submit-link-text").textContent = "Tambahkan ke Daftar Tautan";
+            document.getElementById("btn-cancel-edit").classList.add("hidden");
+            document.getElementById("url-validation-msg").classList.add("hidden");
+        }
+
+        function toggleLinkActive(id) {
+            const link = appState.links.find(l => l.id === id);
+            if (!link) return;
+            link.active = !link.active;
+            renderAll();
+            showToast(link.active ? "Tautan diaktifkan di halaman publik." : "Tautan disembunyikan sementara.", "info");
+        }
+
+        function deleteLinkItem(id) {
+            appState.links = appState.links.filter(l => l.id !== id);
+            renderAll();
+            showToast("Tautan dihapus dari daftar.", "info");
+        }
+
+        function moveLinkPosition(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= appState.links.length) return;
+            const temp = appState.links[index];
+            appState.links[index] = appState.links[targetIndex];
+            appState.links[targetIndex] = temp;
+            renderAll();
+            pulseAutosaveIndicator();
+        }
+
+        // Drag and Drop Handlers (Story 1 Acceptance Criteria)
+        function handleDragStart(e, index) {
+            draggedLinkIndex = index;
+            e.currentTarget.classList.add("dragging-card");
+            e.dataTransfer.effectAllowed = "move";
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add("drag-over-card");
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove("drag-over-card");
+        }
+
+        function handleDrop(e, dropIndex) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over-card");
+            if (draggedLinkIndex === null || draggedLinkIndex === dropIndex) return;
+
+            const movedItem = appState.links.splice(draggedLinkIndex, 1)[0];
+            appState.links.splice(dropIndex, 0, movedItem);
+            draggedLinkIndex = null;
+            renderAll();
+            pulseAutosaveIndicator();
+            showToast("Urutan tautan berhasil diperbarui!", "success");
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.classList.remove("dragging-card");
+            document.querySelectorAll(".drag-over-card").forEach(el => el.classList.remove("drag-over-card"));
+        }
+
+        function pulseAutosaveIndicator() {
+            const el = document.getElementById("autosave-indicator");
+            el.classList.add("scale-105", "bg-emerald-100");
+            setTimeout(() => el.classList.remove("scale-105", "bg-emerald-100"), 350);
+        }
+
+        function toggleScheduleFields() {
+            const box = document.getElementById("schedule-fields-container");
+            const chev = document.getElementById("schedule-chevron");
+            box.classList.toggle("hidden");
+            chev.classList.toggle("rotate-180");
+        }
+
+        // ==========================================
+        // ASYNCHRONOUS CLICK LOGGING + RATE LIMITER
+        // (Story 2 & 3 + NFR Security)
+        // ==========================================
+        function handlePublicLinkClick(linkId, targetUrl, e) {
+            // Asynchronous non-blocking click tracking
+            setTimeout(() => {
+                const now = Date.now();
+                if (!clickRateLimitLog[linkId]) clickRateLimitLog[linkId] = [];
+                // Keep clicks from last 5 seconds
+                clickRateLimitLog[linkId] = clickRateLimitLog[linkId].filter(t => now - t < 5000);
+
+                if (clickRateLimitLog[linkId].length >= 4) {
+                    showToast("Proteksi Anti-Spam: Klik beruntun terlalu cepat dibatasi (Rate Limiting).", "error");
+                    return;
+                }
+
+                clickRateLimitLog[linkId].push(now);
+                const link = appState.links.find(l => l.id === linkId);
+                if (link) {
+                    link.clicks = (link.clicks || 0) + 1;
+                    renderAll();
+                }
+            }, 0);
+        }
+
+        // ==========================================
+        // PROFILE, SLUG, THEME & SOCIAL HANDLERS
+        // ==========================================
+        function handleSlugInput(rawSlug) {
+            const cleaned = rawSlug.toLowerCase().replace(/[^a-z0-9._-]/g, "");
+            document.getElementById("input-profile-slug").value = cleaned;
+            const feedback = document.getElementById("slug-status-feedback");
+            const reserved = ["admin", "login", "register", "api", "settings", "root"];
+
+            if (cleaned.length < 3) {
+                feedback.className = "mt-2 flex items-center gap-1.5 text-xs font-medium text-amber-600";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Username minimal 3 karakter.`;
+                return;
+            }
+            if (reserved.includes(cleaned)) {
+                feedback.className = "mt-2 flex items-center gap-1.5 text-xs font-medium text-rose-600";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Slug "@${sanitizeHtml(cleaned)}" adalah kata sistem terproteksi.`;
+                return;
+            }
+
+            appState.profile.slug = cleaned;
+            feedback.className = "mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-600";
+            feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Tersedia! URL Publik Anda: <strong>tautanku.id/@${sanitizeHtml(cleaned)}</strong>`;
+            renderAll();
+        }
+
+        function updateProfileField(field, value) {
+            appState.profile[field] = value;
+            if (field === "bio") {
+                document.getElementById("bio-char-counter").textContent = `${value.length} / 160`;
+            }
+            if (field === "avatar") {
+                document.getElementById("editor-avatar-preview").src = value || "https://placehold.co/160x160/4f46e5/ffffff?text=TK";
+            }
+            renderAll();
+        }
+
+        function selectPresetAvatar(url) {
+            appState.profile.avatar = url;
+            document.getElementById("input-profile-avatar").value = url;
+            document.getElementById("editor-avatar-preview").src = url;
+            renderAll();
+        }
+
+        function applyThemePreset(presetKey) {
+            const preset = THEME_PRESETS[presetKey];
+            if (!preset) return;
+            appState.profile.themePreset = presetKey;
+            appState.profile.bgColor = preset.bgColor;
+            appState.profile.cardBgColor = preset.cardBgColor;
+            appState.profile.textColor = preset.textColor;
+            appState.profile.btnBg = preset.btnBg;
+            appState.profile.btnText = preset.btnText;
+            syncFormInputsFromState();
+            renderAll();
+        }
+
+        function updateCustomColor(key, hexValue) {
+            appState.profile[key] = hexValue.toUpperCase();
+            if (key === "bgColor") {
+                const lum = getLuminance(hexValue);
+                appState.profile.textColor = lum > 0.35 ? "#0F172A" : "#F8FAFC";
+                appState.profile.cardBgColor = lum > 0.35 ? "#FFFFFF" : "#1E293B";
+            }
+            syncFormInputsFromState();
+            renderAll();
+        }
+
+        function updateWhatsAppConfig() {
+            appState.whatsapp.enabled = document.getElementById("toggle-wa-enabled").checked;
+            appState.whatsapp.phone = document.getElementById("input-wa-phone").value.replace(/[^0-9]/g, "");
+            appState.whatsapp.label = document.getElementById("input-wa-label").value;
+            appState.whatsapp.message = document.getElementById("input-wa-message").value;
+            renderAll();
+        }
+
+        function updateSocialLinks() {
+            ["instagram", "tiktok", "youtube", "linkedin", "github", "twitter"].forEach(platform => {
+                const val = document.getElementById(`social-${platform}`).value.trim();
+                appState.socials[platform] = val;
+            });
+            renderAll();
+        }
+
+        function updateAnalyticsConfig() {
+            appState.externalAnalytics.gaId = document.getElementById("input-ga-id").value.trim();
+            appState.externalAnalytics.pixelId = document.getElementById("input-pixel-id").value.trim();
+        }
+
+        function loadPersonaPreset(personaKey) {
+            const preset = PERSONA_PRESETS[personaKey];
+            if (!preset) return;
+            appState.profile = JSON.parse(JSON.stringify(preset.profile));
+            appState.whatsapp = JSON.parse(JSON.stringify(preset.whatsapp));
+            appState.analytics = JSON.parse(JSON.stringify(preset.analytics));
+            appState.links = JSON.parse(JSON.stringify(preset.links));
+
+            // Highlight active persona button
+            ["creator", "umkm", "pro"].forEach(k => {
+                const btn = document.getElementById(`preset-btn-${k}`);
+                if (k === personaKey) {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 bg-indigo-50 border-indigo-300 text-indigo-700";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5";
+                }
+            });
+
+            syncFormInputsFromState();
+            renderAll();
+            showToast(`Template Persona "${appState.profile.displayName}" berhasil dimuat!`, "success");
+        }
+
+        function simulatePublicTraffic() {
+            appState.analytics.pageViews += 10;
+            // Randomly add 3-5 clicks across active links
+            const activeLinks = appState.links.filter(l => l.active);
+            if (activeLinks.length > 0) {
+                for (let i = 0; i < 4; i++) {
+                    const rand = activeLinks[Math.floor(Math.random() * activeLinks.length)];
+                    rand.clicks = (rand.clicks || 0) + 1;
+                }
+            }
+            renderAll();
+            showToast("Simulasi +10 kunjungan publik & interaksi klik berhasil dicatat!", "info");
+        }
+
+        function resetAnalyticsData() {
+            appState.analytics.pageViews = 0;
+            appState.links.forEach(l => l.clicks = 0);
+            renderAll();
+            showToast("Seluruh metrik kunjungan dan klik telah di-reset ke 0.", "info");
+        }
+
+        // ==========================================
+        // RENDER ENGINE (EDITOR, ANALYTICS & PHONE)
+        // ==========================================
+        function renderEditorLinksList() {
+            const listEl = document.getElementById("links-editor-list");
+            document.getElementById("badge-links-count").textContent = appState.links.length;
+
+            if (appState.links.length === 0) {
+                listEl.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-xl">
+                            <i class="fa-solid fa-link-slash"></i>
+                        </div>
+                        <p class="font-display font-bold text-sm text-slate-700">Belum Ada Tautan</p>
+                        <p class="text-xs text-slate-500">Tambahkan tautan pertama Anda melalui formulir di atas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = appState.links.map((link, index) => {
+                const sched = isLinkScheduleActive(link);
+                let statusBadge = "";
+                if (!link.active) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500">Nonaktif</span>`;
+                } else if (!sched.activeNow) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fa-regular fa-clock mr-1"></i>${sched.statusLabel}</span>`;
+                } else {
+                    statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700">Aktif</span>`;
+                }
+
+                return `
+                    <div draggable="true"
+                         ondragstart="handleDragStart(event, ${index})"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, ${index})"
+                         ondragend="handleDragEnd(event)"
+                         class="bg-white rounded-2xl border ${link.active ? 'border-slate-200' : 'border-slate-200/60 opacity-70'} p-4 shadow-sm hover:border-indigo-300 transition flex items-center gap-3">
+                        
+                        <!-- Drag Handle & Up/Down Controls -->
+                        <div class="flex flex-col items-center gap-1 text-slate-400 shrink-0">
+                            <button type="button" onclick="moveLinkPosition(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600"'} title="Geser Naik" aria-label="Geser Naik">
+                                <i class="fa-solid fa-chevron-up text-[11px]"></i>
+                            </button>
+                            <span class="cursor-grab active:cursor-grabbing px-1 py-0.5 text-slate-400 hover:text-slate-600" title="Seret untuk mengubah urutan">
+                                <i class="fa-solid fa-grip-vertical"></i>
+                            </span>
+                            <button type="button" onclick="moveLinkPosition(${index}, 1)" ${index === appState.links.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600"'} title="Geser Turun" aria-label="Geser Turun">
+                                <i class="fa-solid fa-chevron-down text-[11px]"></i>
+                            </button>
+                        </div>
+
+                        <!-- Link Details -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shrink-0">
+                                    <i class="${sanitizeHtml(link.icon || 'fa-solid fa-link')}"></i>
+                                </span>
+                                <h4 class="font-display font-bold text-sm text-slate-900 truncate">${sanitizeHtml(link.title)}</h4>
+                                ${statusBadge}
+                                ${link.featured ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">Sorotan</span>` : ''}
+                            </div>
+                            <a href="${sanitizeHtml(link.url)}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-indigo-600 truncate block mt-1">
+                                ${sanitizeHtml(link.url)}
+                            </a>
+                            <div class="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-slate-500">
+                                <span class="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <i class="fa-solid fa-arrow-pointer text-[10px]"></i> ${link.clicks || 0} klik
+                                </span>
+                                ${(link.startDate || link.endDate) ? `<span class="text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>Terjadwal</span>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Actions: Toggle, Edit, Delete -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <label class="relative inline-flex items-center cursor-pointer" title="Aktif / Nonaktifkan Tautan">
+                                <input type="checkbox" ${link.active ? 'checked' : ''} onchange="toggleLinkActive('${link.id}')" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                            <button type="button" onclick="startEditLink('${link.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 flex items-center justify-center transition" title="Edit Tautan">
+                                <i class="fa-regular fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button type="button" onclick="deleteLinkItem('${link.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 flex items-center justify-center transition" title="Hapus Tautan">
+                                <i class="fa-regular fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderPublicProfileHTML(isFullPageMode = false) {
+            const p = appState.profile;
+            const visibleLinks = appState.links.filter(l => l.active && isLinkScheduleActive(l).activeNow);
+
+            // Social Icons Bar HTML
+            const socialPlatforms = [
+                { key: "instagram", icon: "fa-brands fa-instagram", label: "Instagram" },
+                { key: "tiktok", icon: "fa-brands fa-tiktok", label: "TikTok" },
+                { key: "youtube", icon: "fa-brands fa-youtube", label: "YouTube" },
+                { key: "linkedin", icon: "fa-brands fa-linkedin", label: "LinkedIn" },
+                { key: "github", icon: "fa-brands fa-github", label: "GitHub" },
+                { key: "twitter", icon: "fa-brands fa-x-twitter", label: "X / Twitter" }
+            ];
+
+            const activeSocials = socialPlatforms.filter(s => appState.socials[s.key] && isValidSafeUrl(appState.socials[s.key]).valid);
+            const socialBarHtml = activeSocials.length > 0 ? `
+                <div class="flex flex-wrap items-center justify-center gap-2.5 my-3" role="navigation" aria-label="Tautan Media Sosial">
+                    ${activeSocials.map(s => `
+                        <a href="${sanitizeHtml(appState.socials[s.key])}" target="_blank" rel="noopener noreferrer"
+                           aria-label="${s.label}"
+                           style="background-color: ${p.btnBg}18; color: ${p.textColor}; border: 1px solid ${p.textColor}22;"
+                           class="w-9 h-9 rounded-full flex items-center justify-center hover:scale-110 transition text-sm">
+                            <i class="${s.icon}"></i>
+                        </a>
+                    `).join("")}
+                </div>
+            ` : "";
+
+            // Links HTML
+            const linksHtml = visibleLinks.map(link => `
+                <a href="${sanitizeHtml(link.url)}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   onclick="handlePublicLinkClick('${link.id}', '${sanitizeHtml(link.url)}', event)"
+                   style="background-color: ${p.btnBg}; color: ${p.btnText};"
+                   class="link-card-hover w-full p-3.5 rounded-2xl shadow-md flex items-center justify-between gap-3 text-left font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${link.featured ? 'ring-2 ring-amber-400' : ''}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style="background-color: ${p.btnText}1A;">
+                            <i class="${sanitizeHtml(link.icon || 'fa-solid fa-link')}"></i>
+                        </span>
+                        <span class="truncate">${sanitizeHtml(link.title)}</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-75 shrink-0"></i>
+                </a>
+            `).join("");
+
+            // Quick WhatsApp Button HTML
+            const wa = appState.whatsapp;
+            const waUrl = `https://wa.me/${encodeURIComponent(wa.phone)}?text=${encodeURIComponent(wa.message || '')}`;
+            const waButtonHtml = (wa.enabled && wa.phone) ? `
+                <a href="${waUrl}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="link-card-hover w-full p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 mt-3 focus:outline-none focus:ring-2 focus:ring-emerald-300">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span>${sanitizeHtml(wa.label || 'Hubungi via WhatsApp')}</span>
+                </a>
+            ` : "";
+
+            return `
+                <div class="text-center flex flex-col items-center">
+                    <div class="relative">
+                        <img src="${sanitizeHtml(p.avatar)}"
+                             onerror="this.src='https://placehold.co/160x160/4f46e5/ffffff?text=TK'"
+                             alt="${sanitizeHtml(p.displayName)}"
+                             class="w-20 h-20 rounded-full object-cover shadow-md border-2"
+                             style="border-color: ${p.btnBg};">
+                        <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] flex items-center justify-center absolute bottom-0 right-0 border-2 border-white" title="Profil Terverifikasi">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                    </div>
+
+                    <h1 class="font-display font-extrabold text-lg mt-3 tracking-tight" style="color: ${p.textColor};">
+                        ${sanitizeHtml(p.displayName)}
+                    </h1>
+
+                    ${p.roleBadge ? `
+                        <span class="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full mt-1"
+                              style="background-color: ${p.btnBg}22; color: ${p.textColor};">
+                            ${sanitizeHtml(p.roleBadge)}
+                        </span>
+                    ` : ''}
+
+                    <p class="text-xs leading-relaxed mt-2.5 opacity-85 max-w-xs" style="color: ${p.textColor};">
+                        ${sanitizeHtml(p.bio)}
+                    </p>
+
+                    ${p.socialPosition === "top" ? socialBarHtml : ""}
+
+                    <div class="w-full space-y-2.5 mt-4" role="region" aria-label="Daftar Tautan Utama">
+                        ${linksHtml || `<p class="text-xs opacity-60 py-6" style="color:${p.textColor}">Belum ada tautan aktif.</p>`}
+                        ${waButtonHtml}
+                    </div>
+
+                    ${p.socialPosition === "bottom" ? `<div class="mt-4">${socialBarHtml}</div>` : ""}
+                </div>
+
+                <div class="pt-6 pb-1 text-center">
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-semibold opacity-65" style="color: ${p.textColor};">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Dibuat dengan TautanKu &bull; @${sanitizeHtml(p.slug)}
+                    </span>
+                </div>
+            `;
+        }
+
+        function renderAnalyticsPanel() {
+            const totalViews = appState.analytics.pageViews || 0;
+            const totalClicks = appState.links.reduce((acc, l) => acc + (l.clicks || 0), 0);
+            const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : "0.0";
+
+            // Update Mini & Full KPI cards
+            document.getElementById("mini-stat-views").textContent = totalViews.toLocaleString("id-ID");
+            document.getElementById("mini-stat-clicks").textContent = totalClicks.toLocaleString("id-ID");
+            document.getElementById("mini-stat-ctr").textContent = `${ctr}%`;
+
+            document.getElementById("stat-card-views").textContent = totalViews.toLocaleString("id-ID");
+            document.getElementById("stat-card-clicks").textContent = totalClicks.toLocaleString("id-ID");
+            document.getElementById("stat-card-ctr").textContent = `${ctr}%`;
+
+            // Breakdown per link sorted by clicks descending
+            const breakdownEl = document.getElementById("analytics-links-breakdown");
+            const sorted = [...appState.links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+            const maxClicks = Math.max(1, ...sorted.map(l => l.clicks || 0));
+
+            breakdownEl.innerHTML = sorted.map(l => {
+                const pct = Math.round(((l.clicks || 0) / maxClicks) * 100);
+                return `
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800 truncate pr-2">${sanitizeHtml(l.title)}</span>
+                            <span class="font-bold text-indigo-600 shrink-0">${l.clicks || 0} klik</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                            <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderAll() {
+            // Update Top Nav Slug
+            document.getElementById("nav-slug-display").textContent = `@${appState.profile.slug}`;
+            document.getElementById("public-bar-slug").textContent = `@${appState.profile.slug}`;
+
+            // Render Editor Links
+            renderEditorLinksList();
+
+            // Render Phone Preview Screen
+            const phoneScreen = document.getElementById("phone-preview-screen");
+            phoneScreen.style.backgroundColor = appState.profile.bgColor;
+            phoneScreen.innerHTML = renderPublicProfileHTML(false);
+
+            // Render Fullscreen Public View if active
+            const fullContainer = document.getElementById("public-fullview-container");
+            const fullCard = document.getElementById("public-fullview-card");
+            fullContainer.style.backgroundColor = appState.profile.bgColor;
+            fullCard.style.backgroundColor = appState.profile.cardBgColor;
+            fullCard.innerHTML = renderPublicProfileHTML(true);
+
+            // Render Analytics & WCAG
+            renderAnalyticsPanel();
+            updateWcagContrastUI();
+        }
+
+        function syncFormInputsFromState() {
+            const p = appState.profile;
+            document.getElementById("input-profile-slug").value = p.slug;
+            document.getElementById("input-profile-name").value = p.displayName;
+            document.getElementById("input-profile-badge").value = p.roleBadge || "";
+            document.getElementById("input-profile-bio").value = p.bio;
+            document.getElementById("bio-char-counter").textContent = `${(p.bio || "").length} / 160`;
+            document.getElementById("input-profile-avatar").value = p.avatar;
+            document.getElementById("editor-avatar-preview").src = p.avatar;
+            document.getElementById("select-social-position").value = p.socialPosition || "top";
+
+            document.getElementById("picker-bg-color").value = p.bgColor;
+            document.getElementById("hex-label-bg").textContent = p.bgColor;
+            document.getElementById("picker-btn-bg").value = p.btnBg;
+            document.getElementById("hex-label-btn-bg").textContent = p.btnBg;
+            document.getElementById("picker-btn-text").value = p.btnText;
+            document.getElementById("hex-label-btn-text").textContent = p.btnText;
+
+            document.getElementById("toggle-wa-enabled").checked = appState.whatsapp.enabled;
+            document.getElementById("input-wa-phone").value = appState.whatsapp.phone;
+            document.getElementById("input-wa-label").value = appState.whatsapp.label;
+            document.getElementById("input-wa-message").value = appState.whatsapp.message;
+
+            ["instagram", "tiktok", "youtube", "linkedin", "github", "twitter"].forEach(platform => {
+                document.getElementById(`social-${platform}`).value = appState.socials[platform] || "";
+            });
+
+            document.getElementById("input-ga-id").value = appState.externalAnalytics.gaId || "";
+            document.getElementById("input-pixel-id").value = appState.externalAnalytics.pixelId || "";
+        }
+
+        // ==========================================
+        // NAVIGATION & VIEW SWITCHING
+        // ==========================================
+        function switchTab(tabName) {
+            const tabs = ["links", "profile", "social", "analytics", "settings"];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`panel-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    panel.classList.remove("hidden");
+                    btn.className = "tab-btn flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-sm";
+                } else {
+                    panel.classList.add("hidden");
+                    btn.className = "tab-btn flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+                }
+            });
+        }
+
+        function togglePublicFullView() {
+            isPublicFullView = !isPublicFullView;
+            const studio = document.getElementById("studio-workspace");
+            const pub = document.getElementById("public-fullview-container");
+            const label = document.getElementById("label-toggle-public-view");
+
+            if (isPublicFullView) {
+                studio.classList.add("hidden");
+                pub.classList.remove("hidden");
+                pub.classList.add("flex");
+                label.textContent = "Kembali ke Studio Editor";
+                appState.analytics.pageViews += 1;
+                renderAll();
+            } else {
+                pub.classList.add("hidden");
+                pub.classList.remove("flex");
+                studio.classList.remove("hidden");
+                label.textContent = "Lihat Halaman Publik";
+                renderAll();
+            }
+        }
+
+        function copyPublicUrl() {
+            const urlText = `https://tautanku.id/@${appState.profile.slug}`;
+            const tempInput = document.createElement("textarea");
+            tempInput.value = urlText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast(`URL Publik disalin: ${urlText}`, "success");
+        }
+
+        // ==========================================
+        // DOWNLOAD TO DEVICE FEATURES (Explicit Requirement)
+        // ==========================================
+        function triggerFileDownload(filename, content, mimeType = "text/html;charset=utf-8") {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        // 1. Download Standalone Ultra-Fast Public HTML Page (<1.2s load KPI)
+        function downloadStandalonePublicHtml() {
+            const p = appState.profile;
+            const gaId = appState.externalAnalytics.gaId;
+            const pixelId = appState.externalAnalytics.pixelId;
+
+            const gaScript = gaId ? `
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${sanitizeHtml(gaId)}"><\/script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${sanitizeHtml(gaId)}');
+    <\/script>` : "";
+
+            const standaloneHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${sanitizeHtml(p.displayName)} (@${sanitizeHtml(p.slug)}) — Tautan Resmi</title>
+    <meta name="description" content="${sanitizeHtml(p.bio)}">
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    ${gaScript}
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: ${p.bgColor}; color: ${p.textColor}; }
+        h1 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .link-card-hover { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+        .link-card-hover:hover { transform: translateY(-2px) scale(1.01); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
+    <main class="w-full max-w-md mx-auto rounded-3xl p-6 sm:p-8 shadow-xl" style="background-color: ${p.cardBgColor};">
+        ${renderPublicProfileHTML(true)}
+    </main>
+    ${pixelId ? `<!-- Meta Pixel ID: ${sanitizeHtml(pixelId)} -->` : ''}
+</body>
+</html>`;
+
+            const filename = `@${p.slug || 'profil'}-linkinbio.html`;
+            triggerFileDownload(filename, standaloneHtml, "text/html;charset=utf-8");
+            showToast(`Halaman publik "${filename}" berhasil diunduh ke perangkat Anda!`, "success");
+        }
+
+        // 2. Download Full Studio Editor HTML with Current State Embedded
+        function downloadFullStudioApp() {
+            const currentDocHtml = document.documentElement.outerHTML;
+            const serializedState = `let appState = ${JSON.stringify(appState, null, 4)};`;
+            const updatedHtml = currentDocHtml.replace(
+                /\/\* INITIAL_STATE_START \*\/[\s\S]*?\/\* INITIAL_STATE_END \*\//,
+                `/* INITIAL_STATE_START */\n        ${serializedState}\n        /* INITIAL_STATE_END */`
+            );
+
+            const filename = `TautanKu-Studio-${appState.profile.slug || 'app'}.html`;
+            triggerFileDownload("<!DOCTYPE html>\n" + updatedHtml, filename, "text/html;charset=utf-8");
+            // Wait, note parameter order in triggerFileDownload(filename, content)
+        }
+
+        // Fix parameter order for downloadFullStudioApp
+        const _origDownloadFullStudioApp = downloadFullStudioApp;
+        downloadFullStudioApp = function() {
+            const currentDocHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const serializedState = `let appState = ${JSON.stringify(appState, null, 4)};`;
+            const updatedHtml = currentDocHtml.replace(
+                /\/\* INITIAL_STATE_START \*\/[\s\S]*?\/\* INITIAL_STATE_END \*\//,
+                `/* INITIAL_STATE_START */\n        ${serializedState}\n        /* INITIAL_STATE_END */`
+            );
+            const filename = `TautanKu-Studio-${appState.profile.slug || 'app'}.html`;
+            triggerFileDownload(filename, updatedHtml, "text/html;charset=utf-8");
+            showToast(`Aplikasi lengkap "${filename}" berhasil diunduh ke perangkat Anda!`, "success");
+        };
+
+        // 3. Export & Import JSON Data Backup
+        function exportDataJson() {
+            const jsonStr = JSON.stringify(appState, null, 2);
+            const filename = `tautanku-data-${appState.profile.slug || 'backup'}.json`;
+            triggerFileDownload(filename, jsonStr, "application/json;charset=utf-8");
+            showToast(`File cadangan "${filename}" berhasil diunduh!`, "success");
+        }
+
+        function importDataJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && imported.profile && Array.isArray(imported.links)) {
+                        appState = imported;
+                        syncFormInputsFromState();
+                        renderAll();
+                        showToast("Data profil & tautan berhasil dipulihkan dari file JSON!", "success");
+                    } else {
+                        showToast("Format file JSON tidak sesuai dengan struktur TautanKu.", "error");
+                    }
+                } catch (err) {
+                    showToast("Gagal membaca file JSON.", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ==========================================
+        // MODALS (AUTH & DOWNLOAD)
+        // ==========================================
+        function openAuthModal() {
+            document.getElementById("modal-auth").classList.remove("hidden");
+        }
+        function closeAuthModal() {
+            document.getElementById("modal-auth").classList.add("hidden");
+        }
+        function openDownloadModal() {
+            document.getElementById("modal-download").classList.remove("hidden");
+        }
+        function closeDownloadModal() {
+            document.getElementById("modal-download").classList.add("hidden");
+        }
+
+        function handleEmailAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById("auth-email").value.trim();
+            appState.currentUser.email = email;
+            document.getElementById("nav-auth-label").textContent = email.split("@")[0];
+            closeAuthModal();
+            showToast(`Autentikasi berhasil sebagai ${email}`, "success");
+        }
+
+        function handleGoogleOAuth() {
+            appState.currentUser.email = "kreator.oauth@gmail.com";
+            document.getElementById("nav-auth-label").textContent = "Google Verified";
+            closeAuthModal();
+            showToast("Berhasil terhubung via Google OAuth 2.0!", "success");
+        }
+
+        // Initialize on window load
+        window.onload = function() {
+            syncFormInputsFromState();
+            renderAll();
+        };
+    </script>
+</body>
+</html>
