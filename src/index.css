@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4D4D8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A1AA;
+}
+
+/* Animated Aurora Keyframes */
+@keyframes auroraMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(25px, -30px) scale(1.12); }
+  66% { transform: translate(-20px, 20px) scale(0.92); }
+}
+
+.aurora-bg {
+  background-size: 300% 300% !important;
+  animation: auroraMove 12s ease infinite !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  filter: blur(55px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+  animation: floatOrb 10s ease-in-out infinite;
+}
+
+.aurora-bg::before {
+  top: -10%;
+  left: -15%;
+  background: var(--orb-1, rgba(255, 255, 255, 0.4));
+}
+
+.aurora-bg::after {
+  bottom: -10%;
+  right: -15%;
+  background: var(--orb-2, rgba(255, 255, 255, 0.3));
+  animation-delay: -5s;
+}
+
+/* Preset Aurora Colors */
+.aurora-northern {
+  background: linear-gradient(-45deg, #090D16, #0D3B2E, #1E1B4B, #064E3B, #311042);
+  --orb-1: #10B981;
+  --orb-2: #6366F1;
+}
+
+.aurora-sunset {
+  background: linear-gradient(-45deg, #2E1065, #701A75, #BE123C, #FB923C, #4C1D95);
+  --orb-1: #F43F5E;
+  --orb-2: #F59E0B;
+}
+
+.aurora-cyber {
+  background: linear-gradient(-45deg, #09090B, #1E1B4B, #0284C7, #7C3AED, #0F172A);
+  --orb-1: #38BDF8;
+  --orb-2: #A855F7;
+}
+
+.aurora-matcha {
+  background: linear-gradient(-45deg, #ECFCCB, #D9F99D, #A7F3D0, #FEF08A, #CCFBF1);
+  --orb-1: #34D399;
+  --orb-2: #A3E635;
+}
+
+.aurora-cotton {
+  background: linear-gradient(-45deg, #FFF1F2, #FCE7F3, #E0E7FF, #F3E8FF, #FFE4E6);
+  --orb-1: #F472B6;
+  --orb-2: #818CF8;
+}
+
+.glass-btn {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
