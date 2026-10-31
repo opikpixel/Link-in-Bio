@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, Share2, Check, ExternalLink } from 'lucide-react';
+import { ArrowUpRight, Share2, Check, ExternalLink, SlidersHorizontal } from 'lucide-react';
 import SocialIcon from './SocialIcon';
 
 export default function PublicBioPage({
@@ -66,14 +66,16 @@ export default function PublicBioPage({
         ></div>
       )}
 
-      {/* FLOATING TOP ACTION (Share & Back to editor) */}
+      {/* FLOATING TOP ACTION (Studio Mode & Share) */}
       <div className="relative z-20 w-full max-w-md flex items-center justify-between mb-4">
         {onBackToEditor ? (
           <button
             onClick={onBackToEditor}
-            className="px-3 py-1.5 rounded-full text-xs font-semibold bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 transition active:scale-95 text-white/90"
+            className="px-3 py-1.5 rounded-full text-xs font-medium bg-black/30 hover:bg-black/50 backdrop-blur-md border border-white/15 transition active:scale-95 text-white/80 flex items-center gap-1.5 shadow-sm"
+            title="Masuk ke Mode Studio Editor"
           >
-            ← Kembali ke Editor
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Studio</span>
           </button>
         ) : (
           <div></div>
@@ -81,7 +83,7 @@ export default function PublicBioPage({
 
         <button
           onClick={handleShare}
-          className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 transition active:scale-95 text-white"
+          className="p-2.5 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md border border-white/15 transition active:scale-95 text-white shadow-sm"
           title="Bagikan Tautan Profil"
         >
           {copied ? (

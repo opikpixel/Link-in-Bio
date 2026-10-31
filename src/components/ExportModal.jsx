@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Download, Copy, Check, Globe, Code2 } from 'lucide-react';
+import { X, Download, Copy, Check, Globe, Code2, FileJson, Upload, Edit3 } from 'lucide-react';
 
 export default function ExportModal({
   isOpen,
@@ -8,19 +8,61 @@ export default function ExportModal({
   appearance,
   links,
   slug,
+  fullState,
+  onImportConfig,
   showToast,
 }) {
-  const [copied, setCopied] = useState(false);
+  const [copiedPublic, setCopiedPublic] = useState(false);
+  const [copiedEditor, setCopiedEditor] = useState(false);
 
   if (!isOpen) return null;
 
   const publicUrl = window.location.origin + window.location.pathname;
+  const editorUrl = publicUrl + (publicUrl.includes('?') ? '&' : '?') + 'edit=true';
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(publicUrl);
-    setCopied(true);
-    showToast('Tautan profil disalin!');
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyLink = (url, isPublic) => {
+    navigator.clipboard.writeText(url);
+    if (isPublic) {
+      setCopiedPublic(true);
+      setTimeout(() => setCopiedPublic(false), 2000);
+    } else {
+      setCopiedEditor(true);
+      setTimeout(() => setCopiedEditor(false), 2000);
+    }
+    showToast('Tautan berhasil disalin!');
+  };
+
+  const handleDownloadBackup = () => {
+    const dataStr = JSON.stringify(fullState || { profile, appearance, links, slug }, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `opiklink-config-${slug || 'backup'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('File konfigurasi JSON berhasil diunduh!');
+  };
+
+  const handleUploadBackup = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        if (onImportConfig) {
+          onImportConfig(parsed);
+          onClose();
+        }
+      } catch (err) {
+        showToast('Gagal membaca file JSON!');
+      }
+    };
+    reader.readAsText(file);
   };
 
   const downloadStandaloneHtml = () => {
@@ -222,26 +264,93 @@ export default function ExportModal({
           </button>
         </div>
 
-        {/* SALIN TAUTAN */}
-        <div className="p-4 rounded-2xl border border-zinc-200/90 bg-zinc-50 space-y-2">
-          <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-purple-600" />
-            Tautan Profil Langsung
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              value={publicUrl}
-              className="flex-1 px-3 py-2 rounded-xl bg-white border border-zinc-300 text-xs font-mono text-zinc-600 outline-none"
-            />
+        {/* TAUTAN PUBLIK VS EDITOR */}
+        <div className="space-y-3">
+          <div className="p-4 rounded-2xl border border-zinc-200/90 bg-zinc-50 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-purple-600" />
+                Tautan Profil Publik (Untuk Pengunjung / Bio Instagram)
+              </label>
+              <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">
+                Mode Preview
+              </span>
+            </div>
+            <p className="text-[11px] text-zinc-500">
+              Bagikan link ini ke publik. Pengunjung otomatis melihat halaman profil tanpa panel editor.
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={publicUrl}
+                className="flex-1 px-3 py-2 rounded-xl bg-white border border-zinc-300 text-xs font-mono text-zinc-600 outline-none"
+              />
+              <button
+                onClick={() => handleCopyLink(publicUrl, true)}
+                className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+              >
+                {copiedPublic ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedPublic ? 'Tersalin' : 'Salin'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl border border-zinc-200/90 bg-zinc-50/70 space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
+              <Edit3 className="w-3.5 h-3.5 text-zinc-600" />
+              Tautan Khusus Mode Editor (Untuk Anda Sendiri)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={editorUrl}
+                className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-zinc-200 text-xs font-mono text-zinc-500 outline-none"
+              />
+              <button
+                onClick={() => handleCopyLink(editorUrl, false)}
+                className="px-3 py-1.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+              >
+                {copiedEditor ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedEditor ? 'Tersalin' : 'Salin'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* CADANGKAN & PULIHKAN DATA JSON */}
+        <div className="p-4 rounded-2xl border border-blue-200/80 bg-blue-50/40 space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+                <FileJson className="w-4 h-4 text-blue-600" />
+                Cadangkan & Pulihkan Konfigurasi (.json)
+              </h4>
+              <p className="text-[11px] text-zinc-500 mt-0.5">
+                Pindahkan tampilan Anda antar-browser/perangkat dalam 1 klik tanpa hilang.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
             <button
-              onClick={handleCopyLink}
-              className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+              onClick={handleDownloadBackup}
+              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-2xs"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-              <span>{copied ? 'Tersalin' : 'Salin'}</span>
+              <Download className="w-3.5 h-3.5 text-blue-600" />
+              <span>Unduh Cadangan (.json)</span>
             </button>
+
+            <label className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs">
+              <Upload className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Pulihkan Cadangan</span>
+              <input
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={handleUploadBackup}
+              />
+            </label>
           </div>
         </div>
 
@@ -253,7 +362,7 @@ export default function ExportModal({
               Unduh Standalone HTML
             </h4>
             <p className="text-xs text-zinc-500 mt-0.5">
-              File HTML mandiri satu halaman yang siap di-upload ke GitHub Pages tanpa konfigurasi tambahan.
+              File HTML mandiri satu halaman yang siap di-hosting langsung di mana saja.
             </p>
           </div>
           <button

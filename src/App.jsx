@@ -34,7 +34,21 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState('links');
-  const [viewMode, setViewMode] = useState('editor'); // 'editor' | 'preview'
+  const [viewMode, setViewMode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    // Jika URL mengandung ?edit=true atau #edit, masuk ke Editor
+    if (
+      params.get('edit') === 'true' ||
+      params.get('mode') === 'editor' ||
+      hash === '#edit' ||
+      hash === '#editor'
+    ) {
+      return 'editor';
+    }
+    // Default untuk publik/pengunjung: Halaman Profil Link-in-Bio
+    return 'preview';
+  });
   const [toastMessage, setToastMessage] = useState('');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -105,6 +119,15 @@ export default function App() {
     localStorage.removeItem('opiklink_active_user');
     setState(JSON.parse(JSON.stringify(DEFAULT_STATE)));
     showToast('Telah keluar dari akun');
+  };
+
+  const handleImportConfig = (newConfig) => {
+    if (!newConfig || !newConfig.profile || !newConfig.links) {
+      showToast('Format file JSON tidak valid!');
+      return;
+    }
+    setState(newConfig);
+    showToast('Konfigurasi berhasil dipulihkan!');
   };
 
   // IF IN FULL PUBLIC BIO PREVIEW MODE
@@ -199,6 +222,8 @@ export default function App() {
         appearance={state.appearance}
         links={state.links}
         slug={state.slug || 'lutfi'}
+        fullState={state}
+        onImportConfig={handleImportConfig}
         showToast={showToast}
       />
 
