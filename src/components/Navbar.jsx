@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Eye,
   Edit3,
+  Flame,
 } from 'lucide-react';
 
 export default function Navbar({
@@ -15,6 +16,8 @@ export default function Navbar({
   userEmail,
   onOpenAuth,
   onOpenExport,
+  onOpenFirebase,
+  isCloudConnected,
   slug,
   viewMode,
   setViewMode,
@@ -104,6 +107,22 @@ export default function Navbar({
                 <span className="hidden md:inline">Mode Editor</span>
               </>
             )}
+          </button>
+
+          {/* Cloud Database (Firebase) */}
+          <button
+            onClick={onOpenFirebase}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs sm:text-sm font-semibold transition ${
+              isCloudConnected
+                ? 'bg-amber-500/10 border-amber-300 text-amber-800 hover:bg-amber-500/20 shadow-2xs'
+                : 'bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700 shadow-2xs'
+            }`}
+            title="Pengaturan Database Cloud Firestore"
+          >
+            <Flame className={`w-4 h-4 ${isCloudConnected ? 'text-amber-500 fill-amber-500' : 'text-zinc-400'}`} />
+            <span className="hidden md:inline">
+              {isCloudConnected ? 'Cloud Aktif' : 'Hubungkan Cloud'}
+            </span>
           </button>
 
           {/* User Account / Google Login */}

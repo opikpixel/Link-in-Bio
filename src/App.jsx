@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DEFAULT_STATE } from './data/defaultState';
 import Navbar from './components/Navbar';
 import LinksEditor from './components/LinksEditor';
@@ -8,7 +8,10 @@ import PhonePreview from './components/PhonePreview';
 import PublicBioPage from './components/PublicBioPage';
 import AuthModal from './components/AuthModal';
 import ExportModal from './components/ExportModal';
+import FirebaseModal from './components/FirebaseModal';
 import Toast from './components/Toast';
+import { isFirebaseConfigured } from './firebase/config';
+import { fetchBioFromCloud, saveBioToCloud, subscribeBioFromCloud } from './firebase/bioService';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState(() => {
@@ -52,6 +55,47 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState('');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isFirebaseOpen, setIsFirebaseOpen] = useState(false);
+  const [isCloudConnected, setIsCloudConnected] = useState(() => isFirebaseConfigured());
+  const isInitialCloudSyncDone = useRef(false);
+
+  // Ambil data dari Firebase saat aplikasi pertama kali dimuat
+  useEffect(() => {
+    if (isFirebaseConfigured()) {
+      setIsCloudConnected(true);
+      const slug = state.slug || 'lutfi';
+
+      // Subscribe perubahan secara real-time
+      const unsubscribe = subscribeBioFromCloud(slug, (cloudData) => {
+        if (cloudData && cloudData.profile && cloudData.links) {
+          setState((prev) => ({
+            ...prev,
+            ...cloudData,
+          }));
+          isInitialCloudSyncDone.current = true;
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [state.slug]);
+
+  // Sinkronkan editan ke Cloud Firestore secara otomatis (Debounced 1.5s)
+  useEffect(() => {
+    if (!isFirebaseConfigured() || !isInitialCloudSyncDone.current) return;
+
+    const timer = setTimeout(() => {
+      saveBioToCloud(state, state.slug || 'lutfi')
+        .then(() => {
+          console.log('Auto-saved to Cloud Firestore');
+        })
+        .catch((err) => {
+          console.error('Failed to auto-save to cloud', err);
+        });
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [state]);
 
   // Auto-save to localStorage whenever state or userEmail changes
   useEffect(() => {
@@ -153,6 +197,8 @@ export default function App() {
         userEmail={userEmail}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
+        onOpenFirebase={() => setIsFirebaseOpen(true)}
+        isCloudConnected={isCloudConnected}
         slug={state.slug || 'lutfi'}
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -225,6 +271,14 @@ export default function App() {
         fullState={state}
         onImportConfig={handleImportConfig}
         showToast={showToast}
+      />
+
+      <FirebaseModal
+        isOpen={isFirebaseOpen}
+        onClose={() => setIsFirebaseOpen(false)}
+        currentState={state}
+        showToast={showToast}
+        onConnected={() => setIsCloudConnected(true)}
       />
 
       <Toast message={toastMessage} />
