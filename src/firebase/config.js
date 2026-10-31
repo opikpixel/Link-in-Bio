@@ -1,14 +1,15 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
-// Default static config (bisa diisi langsung oleh pengguna)
+// Default static config resmi dari Firebase Console
 export const HARDCODED_FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyCkNTZpA11YwycQptgwOhRK5VaBWA4HX8g",
+  authDomain: "opik-link-in-bio.firebaseapp.com",
+  projectId: "opik-link-in-bio",
+  storageBucket: "opik-link-in-bio.firebasestorage.app",
+  messagingSenderId: "866506510391",
+  appId: "1:866506510391:web:d0da3387ea151e406cefb2",
+  measurementId: "G-2EWXCLRK1H"
 };
 
 export const getStoredFirebaseConfig = () => {

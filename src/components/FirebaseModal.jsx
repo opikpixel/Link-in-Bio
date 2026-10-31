@@ -28,18 +28,22 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
 
     try {
       let parsed = null;
-      // Coba parse jika format JSON
-      if (configText.trim().startsWith('{')) {
+      // 1. Coba parse JSON murni
+      try {
         parsed = JSON.parse(configText);
-      } else {
-        // Coba ekstrak jika user paste const firebaseConfig = { ... };
-        const match = configText.match(/\{[\s\S]*\}/);
-        if (match) {
-          // Ganti key tanpa tanda kutip agar valid JSON jika ada
-          const jsonLike = match[0]
-            .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":')
-            .replace(/'/g, '"');
-          parsed = JSON.parse(jsonLike);
+      } catch (err) {
+        // 2. Ekstrak field satu per satu jika user paste kode javascript
+        const fields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId', 'measurementId'];
+        const extracted = {};
+        for (const f of fields) {
+          const regex = new RegExp(`['"]?${f}['"]?\\s*:\\s*['"]([^'"]+)['"]`);
+          const m = configText.match(regex);
+          if (m) {
+            extracted[f] = m[1];
+          }
+        }
+        if (extracted.apiKey && extracted.projectId) {
+          parsed = extracted;
         }
       }
 
