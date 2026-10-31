@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, Flame, Check, AlertCircle, Database, ExternalLink, RefreshCw } from 'lucide-react';
-import { getStoredFirebaseConfig, isFirebaseConfigured } from '../firebase/config';
+import { X, Flame, Check, Database, ExternalLink, RefreshCw, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { getStoredFirebaseConfig } from '../firebase/config';
 import { saveBioToCloud } from '../firebase/bioService';
+import { getCurrentFirebaseUser } from '../firebase/authService';
 
-export default function FirebaseModal({ isOpen, onClose, currentState, showToast, onConnected }) {
+export default function FirebaseModal({ isOpen, onClose, currentState, showToast, onConnected, onOpenAuth }) {
   const [configText, setConfigText] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [saving, setSaving] = useState(false);
+  const currentUser = getCurrentFirebaseUser();
 
   useEffect(() => {
     if (isOpen) {
@@ -53,9 +55,16 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
 
       localStorage.setItem('opiklink_firebase_config', JSON.stringify(parsed));
       setIsConnected(true);
-      showToast('Firebase berhasil dikonfigurasi!');
+      showToast('Konfigurasi Firebase tersimpan!');
 
-      // Langsung sinkronkan data saat ini ke cloud
+      // Cek apakah user sudah login
+      if (!getCurrentFirebaseUser()) {
+        showToast('Konfigurasi siap! Silakan Login Admin untuk menyinkronkan data.');
+        if (onConnected) onConnected();
+        return;
+      }
+
+      // Langsung sinkronkan data saat ini ke cloud jika sudah login
       setSaving(true);
       try {
         await saveBioToCloud(currentState, currentState.slug || 'lutfi');
@@ -63,7 +72,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
         if (onConnected) onConnected();
       } catch (cloudErr) {
         console.error(cloudErr);
-        showToast('Koneksi tersimpan, tapi pastikan aturan Firestore Rules sudah dibuat!');
+        showToast('Koneksi tersimpan, pastikan Rules Firestore mengizinkan write untuk akun yang login!');
       } finally {
         setSaving(false);
       }
@@ -91,7 +100,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
             <div>
               <h3 className="text-lg font-bold text-zinc-900">Database Cloud Firebase</h3>
               <p className="text-xs text-zinc-500">
-                Sinkronkan perubahan dari editor langsung ke publik seketika.
+                Sinkronkan perubahan profil seketika ke pengunjung publik.
               </p>
             </div>
           </div>
@@ -117,7 +126,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
               </p>
               <p className="text-[11px] opacity-80">
                 {isConnected
-                  ? 'Setiap editan Anda akan langsung tersinkron ke publik di seluruh dunia.'
+                  ? 'Data Firestore siap disinkronkan secara aman.'
                   : 'Publik masih membaca data lokal/baku bawaan.'}
               </p>
             </div>
@@ -132,35 +141,43 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
           )}
         </div>
 
-        {/* PANDUAN CEPAT (3 LANGKAH) */}
-        <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/90 text-xs text-zinc-700 space-y-2">
-          <p className="font-bold text-zinc-900 flex items-center gap-1.5">
-            <Database className="w-4 h-4 text-amber-600" />
-            Cara Dapatkan Firebase Config (Gratis 100%):
-          </p>
-          <ol className="list-decimal list-inside space-y-1 text-zinc-600 leading-relaxed">
-            <li>
-              Buka{' '}
-              <a
-                href="https://console.firebase.google.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="text-amber-600 font-semibold underline inline-flex items-center gap-0.5"
-              >
-                Firebase Console <ExternalLink className="w-3 h-3 inline" />
-              </a>{' '}
-              dan buat proyek baru.
-            </li>
-            <li>Di menu kiri, buat <strong>Firestore Database</strong> (Pilih *Start in test mode*).</li>
-            <li>Di *Project Settings* (ikon gerigi), klik tambah Web App (<strong>&lt;/&gt;</strong>) lalu salin <strong>firebaseConfig</strong>.</li>
-          </ol>
+        {/* STATUS AUTH ADMIN */}
+        <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+          currentUser
+            ? 'bg-emerald-50/60 border-emerald-200 text-emerald-900'
+            : 'bg-amber-50 border-amber-200 text-amber-900'
+        }`}>
+          <div className="flex items-center gap-2">
+            {currentUser ? (
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            ) : (
+              <ShieldAlert className="w-4 h-4 text-amber-600" />
+            )}
+            <span>
+              {currentUser
+                ? `Login sebagai Admin: ${currentUser.email}`
+                : 'Belum Login Admin (Akses Tulis/Simpan Terkunci)'}
+            </span>
+          </div>
+          {!currentUser && onOpenAuth && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onOpenAuth();
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-500 text-white font-bold hover:bg-amber-600 transition"
+            >
+              Login
+            </button>
+          )}
         </div>
 
         {/* FORM INPUT CONFIG */}
         <form onSubmit={handleSaveConfig} className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-zinc-800 mb-1">
-              Tempel (Paste) Firebase Config Anda di Sini:
+              Konfigurasi Firebase:
             </label>
             <textarea
               rows={6}
@@ -192,7 +209,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Simpan & Sinkronkan</span>
+                  <span>Simpan Konfigurasi</span>
                 </>
               )}
             </button>

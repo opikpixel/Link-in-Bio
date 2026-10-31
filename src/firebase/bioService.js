@@ -1,10 +1,10 @@
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { getFirebaseDb, isFirebaseConfigured } from './config';
+import { getFirebaseDb, getFirebaseAuth } from './config';
 
 const COLLECTION_NAME = 'linkinbio';
 
 /**
- * Mengambil data bio dari Firebase Firestore
+ * Mengambil data bio dari Firebase Firestore (Publik bebas membaca)
  */
 export async function fetchBioFromCloud(slug = 'lutfi') {
   const db = getFirebaseDb();
@@ -26,11 +26,17 @@ export async function fetchBioFromCloud(slug = 'lutfi') {
 
 /**
  * Menyimpan data bio ke Firebase Firestore
+ * Dibatasi HANYA untuk Admin yang sudah terautentikasi (Logged in)
  */
 export async function saveBioToCloud(data, slug = 'lutfi') {
   const db = getFirebaseDb();
   if (!db) {
     throw new Error('Firebase belum dikonfigurasi!');
+  }
+
+  const auth = getFirebaseAuth();
+  if (!auth || !auth.currentUser) {
+    throw new Error('Akses ditolak: Anda harus login sebagai Admin untuk mengubah data!');
   }
 
   const cleanSlug = (slug || 'lutfi').toLowerCase().trim();
@@ -39,6 +45,7 @@ export async function saveBioToCloud(data, slug = 'lutfi') {
   const payload = {
     ...data,
     updatedAt: new Date().toISOString(),
+    updatedBy: auth.currentUser.email || 'admin',
   };
 
   await setDoc(docRef, payload, { merge: true });

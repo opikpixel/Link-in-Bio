@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 // Default static config resmi dari Firebase Console
 export const HARDCODED_FIREBASE_CONFIG = {
@@ -46,19 +47,28 @@ export const isFirebaseConfigured = () => {
 };
 
 let dbInstance = null;
+let authInstance = null;
 
-export const getFirebaseDb = () => {
+export const getFirebaseApp = () => {
   const config = getStoredFirebaseConfig();
   if (!config) return null;
+  return getApps().length === 0 ? initializeApp(config) : getApp();
+};
 
-  try {
-    const app = getApps().length === 0 ? initializeApp(config) : getApp();
-    if (!dbInstance) {
-      dbInstance = getFirestore(app);
-    }
-    return dbInstance;
-  } catch (err) {
-    console.error('Failed to initialize Firebase', err);
-    return null;
+export const getFirebaseDb = () => {
+  const app = getFirebaseApp();
+  if (!app) return null;
+  if (!dbInstance) {
+    dbInstance = getFirestore(app);
   }
+  return dbInstance;
+};
+
+export const getFirebaseAuth = () => {
+  const app = getFirebaseApp();
+  if (!app) return null;
+  if (!authInstance) {
+    authInstance = getAuth(app);
+  }
+  return authInstance;
 };

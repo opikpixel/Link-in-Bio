@@ -10,10 +10,13 @@ import AuthModal from './components/AuthModal';
 import ExportModal from './components/ExportModal';
 import FirebaseModal from './components/FirebaseModal';
 import Toast from './components/Toast';
+import { ShieldAlert, Lock } from 'lucide-react';
 import { isFirebaseConfigured } from './firebase/config';
 import { fetchBioFromCloud, saveBioToCloud, subscribeBioFromCloud } from './firebase/bioService';
+import { subscribeFirebaseUser } from './firebase/authService';
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [userEmail, setUserEmail] = useState(() => {
     return localStorage.getItem('opiklink_active_user') || '';
   });
@@ -52,6 +55,7 @@ export default function App() {
     // Default untuk publik/pengunjung: Halaman Profil Link-in-Bio
     return 'preview';
   });
+
   const [toastMessage, setToastMessage] = useState('');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -59,14 +63,30 @@ export default function App() {
   const [isCloudConnected, setIsCloudConnected] = useState(() => isFirebaseConfigured());
   const isInitialCloudSyncDone = useRef(false);
 
-  // Ambil data dari Firebase saat aplikasi pertama kali dimuat
+  // Listener status login Firebase Auth
+  useEffect(() => {
+    const unsubscribeAuth = subscribeFirebaseUser((user) => {
+      setCurrentUser(user);
+      if (user) {
+        setUserEmail(user.email || '');
+        localStorage.setItem('opiklink_active_user', user.email || '');
+      } else {
+        setUserEmail('');
+        localStorage.removeItem('opiklink_active_user');
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  // Ambil data dari Firebase Firestore saat aplikasi pertama kali dimuat
   useEffect(() => {
     if (isFirebaseConfigured()) {
       setIsCloudConnected(true);
       const slug = state.slug || 'lutfi';
 
-      // Subscribe perubahan secara real-time
-      const unsubscribe = subscribeBioFromCloud(slug, (cloudData) => {
+      // Subscribe perubahan secara real-time dari Cloud Firestore
+      const unsubscribeCloud = subscribeBioFromCloud(slug, (cloudData) => {
         if (cloudData && cloudData.profile && cloudData.links) {
           setState((prev) => ({
             ...prev,
@@ -76,28 +96,30 @@ export default function App() {
         }
       });
 
-      return () => unsubscribe();
+      return () => unsubscribeCloud();
     }
   }, [state.slug]);
 
   // Sinkronkan editan ke Cloud Firestore secara otomatis (Debounced 1.5s)
+  // KEAMANAN: HANYA berjalan jika Admin TERAUTENTIKASI (Logged In)
   useEffect(() => {
     if (!isFirebaseConfigured() || !isInitialCloudSyncDone.current) return;
+    if (!currentUser) return; // Pengunjung tanpa login tidak akan bisa memicu penulisan ke cloud
 
     const timer = setTimeout(() => {
       saveBioToCloud(state, state.slug || 'lutfi')
         .then(() => {
-          console.log('Auto-saved to Cloud Firestore');
+          console.log('Perubahan berhasil diunggah otomatis ke Cloud Firestore');
         })
         .catch((err) => {
-          console.error('Failed to auto-save to cloud', err);
+          console.error('Gagal auto-save ke cloud:', err);
         });
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [state]);
+  }, [state, currentUser]);
 
-  // Auto-save to localStorage whenever state or userEmail changes
+  // Auto-save to localStorage
   useEffect(() => {
     localStorage.setItem(getStorageKey(userEmail), JSON.stringify(state));
   }, [state, userEmail]);
@@ -144,27 +166,6 @@ export default function App() {
     showToast('Statistik analitik telah di-reset');
   };
 
-  const handleLogin = (email) => {
-    setUserEmail(email);
-    localStorage.setItem('opiklink_active_user', email);
-    const saved = localStorage.getItem(getStorageKey(email));
-    if (saved) {
-      try {
-        setState(JSON.parse(saved));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    showToast(`Tersambung ke ${email}`);
-  };
-
-  const handleLogout = () => {
-    setUserEmail('');
-    localStorage.removeItem('opiklink_active_user');
-    setState(JSON.parse(JSON.stringify(DEFAULT_STATE)));
-    showToast('Telah keluar dari akun');
-  };
-
   const handleImportConfig = (newConfig) => {
     if (!newConfig || !newConfig.profile || !newConfig.links) {
       showToast('Format file JSON tidak valid!');
@@ -174,7 +175,7 @@ export default function App() {
     showToast('Konfigurasi berhasil dipulihkan!');
   };
 
-  // IF IN FULL PUBLIC BIO PREVIEW MODE
+  // JIKA DALAM MODE PUBLIK (DEFAULT HALAMAN PROFIL BIO)
   if (viewMode === 'preview') {
     return (
       <PublicBioPage
@@ -187,14 +188,14 @@ export default function App() {
     );
   }
 
-  // STUDIO EDITOR MODE
+  // MODE STUDIO EDITOR
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F3EF] selection:bg-zinc-900 selection:text-white">
       {/* NAVBAR */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        userEmail={userEmail}
+        currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
         onOpenFirebase={() => setIsFirebaseOpen(true)}
@@ -206,8 +207,31 @@ export default function App() {
 
       {/* WORKSPACE */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* LEFT COLUMN: EDITORS (Tautan, Tampilan, Analitik) */}
+        {/* LEFT COLUMN: EDITORS */}
         <div className="lg:col-span-7 space-y-6">
+          {/* BANNER KEAMANAN: Jika belum login sebagai Admin */}
+          {!currentUser && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-300 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold">Mode Pratinjau Editor (Tamu / Belum Login)</p>
+                  <p className="text-[11px] text-amber-700 leading-tight">
+                    Perubahan Anda hanya tersimpan lokal di browser ini. Masuk dengan akun Firebase untuk memperbarui link bio publik.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAuthOpen(true)}
+                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs shrink-0 self-end sm:self-auto"
+              >
+                Login Admin
+              </button>
+            </div>
+          )}
+
           {activeTab === 'links' && (
             <LinksEditor
               links={state.links}
@@ -256,9 +280,8 @@ export default function App() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        userEmail={userEmail}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
+        currentUser={currentUser}
+        showToast={showToast}
       />
 
       <ExportModal
@@ -279,6 +302,7 @@ export default function App() {
         currentState={state}
         showToast={showToast}
         onConnected={() => setIsCloudConnected(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       <Toast message={toastMessage} />

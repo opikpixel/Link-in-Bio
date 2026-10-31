@@ -8,12 +8,14 @@ import {
   Eye,
   Edit3,
   Flame,
+  Lock,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function Navbar({
   activeTab,
   setActiveTab,
-  userEmail,
+  currentUser,
   onOpenAuth,
   onOpenExport,
   onOpenFirebase,
@@ -125,21 +127,34 @@ export default function Navbar({
             </span>
           </button>
 
-          {/* User Account / Google Login */}
+          {/* User Account / Firebase Admin Login */}
           <button
             onClick={onOpenAuth}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/90 text-xs sm:text-sm font-medium text-zinc-800 transition shadow-2xs"
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs sm:text-sm font-medium transition shadow-2xs ${
+              currentUser
+                ? 'bg-emerald-50/80 border-emerald-300 text-emerald-900 hover:bg-emerald-100/70'
+                : 'bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-800'
+            }`}
+            title={currentUser ? `Admin: ${currentUser.email}` : 'Masuk sebagai Admin'}
           >
-            <img
-              src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
-                userEmail || 'Opik'
-              }`}
-              alt="Avatar"
-              className="w-5 h-5 rounded-full bg-zinc-100 object-cover"
-            />
-            <span className="max-w-[110px] truncate hidden md:inline">
-              {userEmail ? userEmail.split('@')[0] : 'Masuk Google'}
-            </span>
+            {currentUser ? (
+              <>
+                <img
+                  src={`https://api.dicebear.com/7.x/notionists/svg?seed=${currentUser.email}`}
+                  alt="Avatar"
+                  className="w-5 h-5 rounded-full bg-emerald-200 object-cover"
+                />
+                <span className="max-w-[110px] truncate hidden md:inline font-bold">
+                  {currentUser.email.split('@')[0]}
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4 text-zinc-500" />
+                <span className="hidden md:inline font-semibold">Login Admin</span>
+              </>
+            )}
             <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
           </button>
 
