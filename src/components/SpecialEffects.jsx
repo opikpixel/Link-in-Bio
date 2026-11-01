@@ -29,18 +29,18 @@ export function ParticleEffectLayer({ mode = 'cyber-fireflies', compact = false 
     resize();
     window.addEventListener('resize', resize);
 
-    const count = compact ? 22 : 42;
+    const count = compact ? 18 : 34;
     const colors = ['#facc15', '#38bdf8', '#818cf8', '#ffffff'];
 
     const particles = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      r: Math.random() * 2.2 + 0.8,
-      vx: (Math.random() - 0.5) * (mode === 'starfield' ? 0.15 : 0.45),
-      vy: mode === 'cyber-fireflies' ? -(Math.random() * 0.45 + 0.15) : (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 0.8,
+      vx: (Math.random() - 0.5) * (mode === 'starfield' ? 0.12 : 0.35),
+      vy: mode === 'cyber-fireflies' ? -(Math.random() * 0.4 + 0.12) : (Math.random() - 0.5) * 0.35,
       color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: Math.random() * 0.65 + 0.2,
-      pulse: Math.random() * 0.02 + 0.008,
+      alpha: Math.random() * 0.6 + 0.2,
+      pulse: Math.random() * 0.015 + 0.005,
     }));
 
     const render = () => {
@@ -51,7 +51,7 @@ export function ParticleEffectLayer({ mode = 'cyber-fireflies', compact = false 
         p.x += p.vx;
         p.y += p.vy;
         p.alpha += p.pulse;
-        if (p.alpha > 0.85 || p.alpha < 0.15) p.pulse = -p.pulse;
+        if (p.alpha > 0.8 || p.alpha < 0.15) p.pulse = -p.pulse;
 
         if (p.x < 0) p.x = canvas.width;
         if (p.x > canvas.width) p.x = 0;
@@ -59,28 +59,27 @@ export function ParticleEffectLayer({ mode = 'cyber-fireflies', compact = false 
         if (p.y > canvas.height) p.y = 0;
 
         ctx.save();
-        ctx.globalAlpha = Math.max(0.1, Math.min(0.9, p.alpha));
+        ctx.globalAlpha = Math.max(0.1, Math.min(0.85, p.alpha));
         ctx.fillStyle = p.color;
-        ctx.shadowBlur = mode === 'cyber-fireflies' ? 10 : 4;
+        ctx.shadowBlur = mode === 'cyber-fireflies' ? 8 : 3;
         ctx.shadowColor = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        // Garis koneksi untuk mode neural-matrix
         if (mode === 'neural-matrix') {
           for (let j = i + 1; j < particles.length; j++) {
             const p2 = particles[j];
             const dx = p.x - p2.x;
             const dy = p.y - p2.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            const maxDist = compact ? 65 : 95;
+            const maxDist = compact ? 60 : 90;
             if (dist < maxDist) {
               ctx.save();
               ctx.strokeStyle = '#38bdf8';
-              ctx.globalAlpha = (1 - dist / maxDist) * 0.22;
-              ctx.lineWidth = 0.7;
+              ctx.globalAlpha = (1 - dist / maxDist) * 0.18;
+              ctx.lineWidth = 0.6;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
@@ -115,14 +114,12 @@ export function ParticleEffectLayer({ mode = 'cyber-fireflies', compact = false 
 /**
  * 2. TYPEWRITER ROLE INDICATOR
  * Menampilkan peran bergantian dengan animasi ketik otomatis + kursor kotak berkedip (#facc15).
- * Mendukung pemisah '|' atau ',' (misal: "IT Project Manager | IT Cloud | Informatics Student")
  */
 export function TypewriterRole({ roleText = '', enabled = true, className = '' }) {
   const [displayText, setDisplayText] = useState('');
   const [roleIndex, setRoleIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Pecah role berdasarkan '|' atau ',' jika ada lebih dari 1, atau gunakan default roles jika kosong
   const roles = React.useMemo(() => {
     if (!roleText || !roleText.trim()) {
       return ['IT Project Manager', 'IT Cloud', 'Informatics Student'];
@@ -147,7 +144,6 @@ export function TypewriterRole({ roleText = '', enabled = true, className = '' }
         const next = currentFullText.slice(0, displayText.length + 1);
         setDisplayText(next);
         if (next === currentFullText) {
-          // Jika hanya 1 kalimat, tetap ketik ulang setelah jeda agak lama
           setTimeout(() => setIsDeleting(true), roles.length > 1 ? 1600 : 3500);
         }
       } else {
@@ -169,7 +165,6 @@ export function TypewriterRole({ roleText = '', enabled = true, className = '' }
 
   return (
     <p className={`inline-flex items-center justify-center font-mono ${className}`}>
-      <span className="text-[#38bdf8] mr-1.5 opacity-80">&gt;</span>
       <span>{displayText}</span>
       <span className="typewriter-cursor" aria-hidden="true" />
     </p>
@@ -177,12 +172,18 @@ export function TypewriterRole({ roleText = '', enabled = true, className = '' }
 }
 
 /**
- * 3. KINETIC TYPOGRAPHY HEADER (3-Layer: Outline tipis - Solid tebal - Outline tipis)
+ * 3. KINETIC TYPOGRAPHY HEADER
  */
-export function KineticHeader({ text, enabled = true, size = 'md' }) {
+export function KineticHeader({ text, enabled = false, size = 'md' }) {
   if (!enabled) {
     return (
-      <h1 className={size === 'sm' ? 'text-lg font-bold tracking-tight' : 'text-xl sm:text-2xl font-bold tracking-tight'}>
+      <h1
+        className={
+          size === 'sm'
+            ? 'text-lg font-bold tracking-tight'
+            : 'text-xl sm:text-2xl font-bold tracking-tight'
+        }
+      >
         {text}
       </h1>
     );
@@ -192,29 +193,24 @@ export function KineticHeader({ text, enabled = true, size = 'md' }) {
 
   return (
     <div className="relative inline-flex flex-col items-center justify-center select-none py-0.5">
-      {/* Layer 1: Top Thin Outline */}
       <span
         aria-hidden="true"
         className={`kinetic-outline-text font-black uppercase tracking-wider leading-none ${
-          size === 'sm' ? 'text-[11px] -mb-1.5' : 'text-xs sm:text-sm -mb-2'
-        } opacity-45`}
+          size === 'sm' ? 'text-[10px] -mb-1' : 'text-xs -mb-1.5'
+        } opacity-40`}
       >
         {text}
       </span>
-
-      {/* Layer 2: Center Solid Cyber Yellow / White Glow */}
       <h1
         className={`kinetic-title font-black tracking-tight text-[#facc15] relative z-10 ${textSizeClass}`}
       >
         {text}
       </h1>
-
-      {/* Layer 3: Bottom Thin Outline */}
       <span
         aria-hidden="true"
         className={`kinetic-outline-text font-black uppercase tracking-wider leading-none ${
-          size === 'sm' ? 'text-[11px] -mt-1.5' : 'text-xs sm:text-sm -mt-2'
-        } opacity-45`}
+          size === 'sm' ? 'text-[10px] -mt-1' : 'text-xs -mt-1.5'
+        } opacity-40`}
       >
         {text}
       </span>
@@ -223,69 +219,44 @@ export function KineticHeader({ text, enabled = true, size = 'md' }) {
 }
 
 /**
- * 4. INFINITE SEAMLESS LOOPING TICKER / CAROUSEL
- * Bergerak menggeser otomatis tanpa batas & berhenti (pause) saat disentuh kursor.
+ * 4. MINIMALIST SECTION PILL (Sesuai Referensi Screenshot: "01 // TAUTAN" di dalam pill kuning bersih)
  */
-export function InfiniteMottoTicker({
-  text = 'HIDUPLAH SEPERTI LARRY • THE SAGE & THE CREATOR • ANALITIS • VISIONER • EKSEKUTOR',
-  enabled = false,
-  compact = false,
-}) {
-  if (!enabled) return null;
-
-  const items = text
-    .split('•')
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  const repeated = [...items, ...items, ...items];
-
+export function SectionPillTag({ code = '01', label = 'SECTION' }) {
   return (
-    <div
-      className={`marquee-container w-full overflow-hidden rounded-full bg-[#070a14]/70 border border-[#818cf8]/25 backdrop-blur-md ${
-        compact ? 'py-1 my-2' : 'py-1.5 my-3'
-      }`}
-      title="Sentuh untuk menghentikan putaran (Pause)"
-    >
-      <div className="marquee-track items-center gap-4">
-        {repeated.map((item, idx) => (
-          <span
-            key={idx}
-            className={`inline-flex items-center gap-2 font-mono font-bold tracking-widest uppercase ${
-              compact ? 'text-[9px] px-1.5' : 'text-[10px] px-2'
-            } text-[#cbd5e1]`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#facc15] shadow-[0_0_6px_#facc15]" />
-            <span>{item}</span>
-            <span className="text-[#e11d48] font-normal">/</span>
-          </span>
-        ))}
-      </div>
-    </div>
+    <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#facc15] text-[#070a14] border-2 border-[#070a14] shadow-[2px_2px_0px_#070a14] text-[10px] font-mono font-bold tracking-wider uppercase">
+      <span>{code}</span>
+      <span>//</span>
+      <span>{label}</span>
+    </span>
   );
 }
 
 /**
- * 5. BRACKET TECH-BADGE
- * Label kategori dengan kurung siku tajam Sci-Fi & aksen #e11d48 / #38bdf8 / #facc15
+ * 5. CARD HEADER NUMBER & STATUS (Sesuai Referensi Screenshot: Nomor [01] + Label + Status [AKTIF])
  */
-export function BracketTechBadge({ children, accent = 'yellow', className = '' }) {
-  const colorMap = {
-    yellow: 'text-[#facc15] border-[#facc15]/40 bg-[#facc15]/10',
-    sky: 'text-[#38bdf8] border-[#38bdf8]/40 bg-[#38bdf8]/10',
-    rose: 'text-[#e11d48] border-[#e11d48]/40 bg-[#e11d48]/10',
-    indigo: 'text-[#818cf8] border-[#818cf8]/40 bg-[#818cf8]/10',
-  };
+export function CardStepHeader({ number = '01', category = 'MODULE', status = 'AKTIF', statusColor = 'emerald' }) {
+  const badgeStyle =
+    statusColor === 'yellow'
+      ? 'bg-[#facc15]/20 text-[#facc15] border-[#facc15]/50'
+      : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40';
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold tracking-wider uppercase border rounded-xs ${
-        colorMap[accent] || colorMap.yellow
-      } ${className}`}
-    >
-      <span className="text-[#e11d48] font-black">[</span>
-      <span>{children}</span>
-      <span className="text-[#38bdf8] font-black">]</span>
-    </span>
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2.5">
+        <span className="px-2 py-0.5 rounded-full bg-[#facc15] text-[#070a14] text-[10px] font-mono font-extrabold">
+          {number}
+        </span>
+        <span className="text-[11px] font-mono font-semibold tracking-widest uppercase text-[#cbd5e1]">
+          {category}
+        </span>
+      </div>
+      {status && (
+        <span
+          className={`px-2.5 py-0.5 rounded-md border text-[10px] font-mono font-bold tracking-wider uppercase ${badgeStyle}`}
+        >
+          {status}
+        </span>
+      )}
+    </div>
   );
 }

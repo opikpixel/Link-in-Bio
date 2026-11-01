@@ -1,13 +1,13 @@
 export const AURORA_PRESETS = [
   {
     id: 'aurora-maghrib',
-    name: 'Maghrib Twilight (Opikz)',
+    name: 'Maghrib Twilight (Scenic)',
     class: 'aurora-maghrib',
     textColor: '#FFFFFF',
     cardBgColor: 'rgba(15, 23, 42, 0.80)',
     cardTextColor: '#FFFFFF',
     previewGradient: 'linear-gradient(180deg, #070a14 0%, #131129 50%, #1f1430 100%)',
-    badge: 'SIGNATURE',
+    badge: 'BRAND',
   },
   {
     id: 'aurora-northern',
@@ -59,23 +59,27 @@ export const AURORA_PRESETS = [
 export const PARTICLE_PRESETS = [
   {
     id: 'cyber-fireflies',
-    name: 'Cyber Fireflies',
-    desc: 'Partikel emas (#facc15) & sky blue (#38bdf8) melayang',
-  },
-  {
-    id: 'neural-matrix',
-    name: 'Neural Matrix',
-    desc: 'Jaringan titik konstelasi sci-fi saling terhubung',
+    name: 'Kunang-Kunang Senja',
+    tag: 'FIREFLIES',
+    desc: 'Partikel emas (#facc15) & biru langit melayang lembut',
   },
   {
     id: 'starfield',
-    name: 'Maghrib Starfield',
-    desc: 'Bintang senja berkedip lembut di latar belakang',
+    name: 'Bintang Malam',
+    tag: 'STARS',
+    desc: 'Taburan bintang senja berkedip tenang',
+  },
+  {
+    id: 'neural-matrix',
+    name: 'Konstelasi Siber',
+    tag: 'NODES',
+    desc: 'Titik konstelasi dengan garis penghubung tipis',
   },
   {
     id: 'none',
     name: 'Tanpa Partikel',
-    desc: 'Latar bersih tanpa animasi partikel',
+    tag: 'OFF',
+    desc: 'Latar bersih tanpa partikel melayang',
   },
 ];
 
@@ -90,6 +94,7 @@ export const DEFAULT_STATE = {
   appearance: {
     bgMode: 'aurora', // 'aurora' | 'image' | 'solid'
     auroraClass: 'aurora-maghrib',
+    showScenicLandscape: true, // Pemandangan bulan, pohon, dan gunung senja
     customImageData: '',
     imageOverlayOpacity: 45,
     imageBlurPx: 4,
@@ -101,10 +106,7 @@ export const DEFAULT_STATE = {
     particleEffect: 'cyber-fireflies', // 'cyber-fireflies' | 'neural-matrix' | 'starfield' | 'none'
     enableTypewriter: true,
     enableKineticHeader: false,
-    enableTechBrackets: true,
-    enableMottoTicker: true,
-    mottoText: 'HIDUPLAH SEPERTI LARRY • THE SAGE & THE CREATOR • ANALITIS • VISIONER • EKSEKUTOR',
-    showOrixBadge: true,
+    showOrixPet: true, // Tampilkan Pet Interaktif Orix di halaman publik
   },
   links: [
     {

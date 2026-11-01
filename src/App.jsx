@@ -6,6 +6,7 @@ import AppearanceEditor from './components/AppearanceEditor';
 import AnalyticsView from './components/AnalyticsView';
 import PhonePreview from './components/PhonePreview';
 import PublicBioPage from './components/PublicBioPage';
+import MaghribLandscapeWallpaper from './components/MaghribLandscapeWallpaper';
 import AuthModal from './components/AuthModal';
 import ExportModal from './components/ExportModal';
 import FirebaseModal from './components/FirebaseModal';
@@ -43,7 +44,6 @@ export default function App() {
   const [viewMode, setViewMode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const hash = window.location.hash;
-    // Jika URL mengandung ?edit=true atau #edit, masuk ke Editor
     if (
       params.get('edit') === 'true' ||
       params.get('mode') === 'editor' ||
@@ -52,7 +52,6 @@ export default function App() {
     ) {
       return 'editor';
     }
-    // Default untuk publik/pengunjung: Halaman Profil Link-in-Bio
     return 'preview';
   });
 
@@ -85,7 +84,6 @@ export default function App() {
       setIsCloudConnected(true);
       const slug = state.slug || 'lutfi';
 
-      // Subscribe perubahan secara real-time dari Cloud Firestore
       const unsubscribeCloud = subscribeBioFromCloud(slug, (cloudData) => {
         if (cloudData && cloudData.profile && cloudData.links) {
           setState((prev) => ({
@@ -106,7 +104,6 @@ export default function App() {
   }, [state.slug]);
 
   // Sinkronkan editan ke Cloud Firestore secara otomatis (Debounced 1.5s)
-  // KEAMANAN: HANYA berjalan jika Admin TERAUTENTIKASI (Logged In)
   useEffect(() => {
     if (!isFirebaseConfigured() || !isInitialCloudSyncDone.current) return;
     if (!currentUser) return;
@@ -180,7 +177,7 @@ export default function App() {
     showToast('Konfigurasi berhasil dipulihkan!');
   };
 
-  // JIKA DALAM MODE PUBLIK (DEFAULT HALAMAN PROFIL BIO)
+  // MODE PUBLIK (DEFAULT HALAMAN PROFIL BIO)
   if (viewMode === 'preview') {
     return (
       <PublicBioPage
@@ -193,9 +190,12 @@ export default function App() {
     );
   }
 
-  // MODE STUDIO EDITOR (MAGHRIB TWILIGHT BRAND IDENTITY - 2 COLUMN DESKTOP LAYOUT)
+  // MODE STUDIO EDITOR (WALLPAPER SENJA POHON & BULAN + TAMPILAN MINIMALIS)
   return (
-    <div className="min-h-screen flex flex-col maghrib-editor-bg text-white selection:bg-[#facc15] selection:text-[#070a14]">
+    <div className="min-h-screen relative flex flex-col bg-[#070a14] text-white selection:bg-[#facc15] selection:text-[#070a14]">
+      {/* WALLPAPER PEMANDANGAN SENJA MAGHRIB (POHON, BULAN, GUNUNG) */}
+      <MaghribLandscapeWallpaper className="fixed inset-0 pointer-events-none z-0" />
+
       {/* NAVBAR */}
       <Navbar
         activeTab={activeTab}
@@ -210,29 +210,29 @@ export default function App() {
         setViewMode={setViewMode}
       />
 
-      {/* WORKSPACE (2-Kolom Desktop: Sisi Kiri Teks/Logika, Sisi Kanan Visual/Grafik) */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* WORKSPACE (2-Kolom Desktop Bersih & Terstruktur) */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-7 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* LEFT COLUMN: EDITORS */}
         <div className="lg:col-span-7 space-y-6">
           {/* BANNER KEAMANAN: Jika belum login sebagai Admin */}
           {!currentUser && (
-            <div className="maghrib-glass tech-corner-box p-4 rounded-2xl border border-[#facc15]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="maghrib-card p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#facc15]/15 text-[#facc15] border border-[#facc15]/30 flex items-center justify-center shrink-0">
-                  <Lock className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-[#facc15]/15 text-[#facc15] border border-[#facc15]/40 flex items-center justify-center shrink-0">
+                  <Lock className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#facc15]">
+                  <p className="text-xs font-bold text-white">
                     Mode Pratinjau Editor (Tamu / Belum Login)
                   </p>
                   <p className="text-[11px] text-[#cbd5e1] leading-tight mt-0.5">
-                    Perubahan Anda hanya tersimpan lokal di browser ini. Masuk dengan akun Firebase untuk memperbarui link bio publik.
+                    Login dengan akun Firebase Admin untuk menyimpan perubahan ke halaman publik.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs font-bold transition shadow-[0_0_12px_rgba(250,204,21,0.3)] shrink-0 self-end sm:self-auto"
+                className="px-4 py-1.5 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] border-2 border-[#070a14] shadow-[2px_2px_0px_#04060e] text-xs font-bold transition shrink-0 self-end sm:self-auto"
               >
                 Login Admin
               </button>

@@ -1,129 +1,321 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+const ORIX_MESSAGES = [
+  'Hoot! Halo, aku Orix! Selamat datang di profil Lutfi 🦉✨',
+  '"Hiduplah seperti Larry" — Eksekusi, Disiplin, Tangguh! ⚡',
+  'Silakan pilih tautan di atas untuk terhubung langsung ya!',
+  'Terima kasih sudah mampir & menyapaku! Semoga harimu cerah 🌟',
+  'Sistem Observasi Orix aktif! Semua tautan siap dijelajahi 🚀',
+];
 
 /**
- * ORIX - THE CYBER OWL (Cybernetic Great Horned Owl)
- * Maskot resmi Lutfi Alhamsyah (Opikz)
- * - Charcoal Dark Grey & Metallic Silver Tips
- * - Glowing Neon Yellow (#facc15) Hexagonal Eyes
- * - Asymmetric Holographic Cyan (#38bdf8) Visor di sisi kiri
- * - Gunmetal sharp beak
+ * INTERACTIVE ORIX CYBER OWL PET
+ * Maskot / Virtual Pet interaktif di tampilan publik:
+ * - Mata heksagonal kuning (#facc15) mengikuti arah kursor/sentuhan
+ * - Berkedip alami & mengepakkan sayap saat diklik/disapa
+ * - Memunculkan balon sapaan interaktif & partikel reaksi
  */
-export default function OrixMascot({ className = 'w-9 h-9', showGlow = true }) {
+export default function OrixMascot({ compact = false, customName = 'Lutfi' }) {
+  const owlRef = useRef(null);
+  const [pupilPos, setPupilPos] = useState({ x: 0, y: 0 });
+  const [isBlinking, setIsBlinking] = useState(false);
+  const [isExcited, setIsExcited] = useState(false);
+  const [msgIndex, setMsgIndex] = useState(0);
+  const [showBubble, setShowBubble] = useState(false);
+  const [petCount, setPetCount] = useState(0);
+
+  // Eye tracking mengikuti posisi mouse
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!owlRef.current) return;
+      const rect = owlRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      const angle = Math.atan2(dy, dx);
+      const dist = Math.min(2.6, Math.hypot(dx, dy) / 45);
+      setPupilPos({
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Kedipan mata alami setiap beberapa detik
+  useEffect(() => {
+    const blinkInterval = setInterval(() => {
+      setIsBlinking(true);
+      setTimeout(() => setIsBlinking(false), 160);
+    }, 4200);
+    return () => clearInterval(blinkInterval);
+  }, []);
+
+  // Sapaan awal singkat saat halaman dimuat
+  useEffect(() => {
+    if (compact) return;
+    const initTimer = setTimeout(() => {
+      setShowBubble(true);
+    }, 1200);
+    const hideTimer = setTimeout(() => {
+      setShowBubble(false);
+    }, 6500);
+    return () => {
+      clearTimeout(initTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [compact]);
+
+  const handleInteract = () => {
+    setIsExcited(true);
+    setPetCount((prev) => prev + 1);
+    setShowBubble(true);
+    setMsgIndex((prev) => (prev + 1) % ORIX_MESSAGES.length);
+
+    setTimeout(() => {
+      setIsExcited(false);
+    }, 650);
+  };
+
+  const currentMessage = ORIX_MESSAGES[msgIndex].replace('Lutfi', customName || 'Lutfi');
+
   return (
-    <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
-      {showGlow && (
-        <div className="absolute inset-0 rounded-full bg-[#facc15]/20 blur-md pointer-events-none" />
+    <div
+      ref={owlRef}
+      className={`relative inline-flex flex-col items-center select-none ${
+        compact ? 'mt-3' : 'mt-5'
+      }`}
+    >
+      {/* BALON DIALOG INTERAKTIF (SPEECH BUBBLE) */}
+      {showBubble && (
+        <div
+          onClick={() => setShowBubble(false)}
+          className={`mb-2 px-3.5 py-2 rounded-2xl bg-[#0f172a]/95 border-2 border-[#facc15] text-white shadow-[3px_3px_0px_#070a14] cursor-pointer transition-all animate-bounce ${
+            compact ? 'max-w-[220px] text-[10px]' : 'max-w-[260px] text-xs'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2 mb-0.5">
+            <span className="text-[10px] font-mono font-bold text-[#facc15] uppercase tracking-wider">
+              ORIX // CYBER PET {petCount > 0 ? `• ♥ ${petCount}` : ''}
+            </span>
+            <span className="text-[10px] text-slate-400">×</span>
+          </div>
+          <p className="leading-snug text-[#cbd5e1] font-medium">{currentMessage}</p>
+        </div>
       )}
-      <svg
-        viewBox="0 0 64 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full relative z-10 drop-shadow-md"
+
+      {/* TOMBOL / KARAKTER BURUNG HANTU ORIX */}
+      <button
+        type="button"
+        onClick={handleInteract}
+        title="Klik untuk menyapa Orix The Cyber Owl!"
+        className={`group relative flex flex-col items-center focus:outline-none transition-transform duration-300 ${
+          isExcited ? '-translate-y-2.5 scale-105' : 'hover:-translate-y-1'
+        }`}
       >
-        {/* Background Shield / Hexagonal Base */}
-        <polygon
-          points="32,3 57,16 57,48 32,61 7,48 7,16"
-          fill="#070a14"
-          stroke="#818cf8"
-          strokeWidth="1.5"
-          strokeOpacity="0.45"
-        />
+        {/* Partikel Sparkle saat disapa */}
+        {isExcited && (
+          <div className="absolute -top-4 inset-x-0 flex justify-between px-2 pointer-events-none">
+            <span className="text-xs text-[#facc15] animate-ping">✨</span>
+            <span className="text-xs text-[#38bdf8] animate-bounce">⚡</span>
+          </div>
+        )}
 
-        {/* Circuit Lines on Background */}
-        <path
-          d="M12 22 L18 22 L22 26 M52 22 L46 22 L42 26"
-          stroke="#38bdf8"
-          strokeWidth="1"
-          strokeOpacity="0.4"
-          strokeLinecap="round"
-        />
+        <svg
+          viewBox="0 0 120 110"
+          className={compact ? 'w-20 h-20' : 'w-24 h-24'}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Ambient Glow di belakang Orix */}
+          <circle cx="60" cy="54" r="38" fill="#facc15" fillOpacity="0.08" />
 
-        {/* Great Horned Owl Ear Tufts (Charcoal Dark Grey with Silver Tips) */}
-        <path
-          d="M14 14 L23 22 L17 27 Z"
-          fill="#1e293b"
-          stroke="#94a3b8"
-          strokeWidth="1.2"
-        />
-        <path
-          d="M50 14 L41 22 L47 27 Z"
-          fill="#1e293b"
-          stroke="#94a3b8"
-          strokeWidth="1.2"
-        />
-        {/* Metallic Silver Tips on Horns */}
-        <path d="M14 14 L18 17.5 L15.5 19.5 Z" fill="#e2e8f0" />
-        <path d="M50 14 L46 17.5 L48.5 19.5 Z" fill="#e2e8f0" />
+          {/* Ranting Pohon Tempat Bertengger (Twilight Tree Branch) */}
+          <path
+            d="M14 92 Q 60 96, 106 89"
+            stroke="#334155"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M90 90 L102 82 M24 92 L15 85"
+            stroke="#334155"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          {/* Daun Kecil Bercahaya di Ranting */}
+          <ellipse cx="104" cy="80" rx="5" ry="2.5" transform="rotate(-25 104 80)" fill="#38bdf8" fillOpacity="0.7" />
+          <ellipse cx="13" cy="83" rx="4.5" ry="2" transform="rotate(20 13 83)" fill="#facc15" fillOpacity="0.7" />
 
-        {/* Owl Head & Geometric 3-Layered Body */}
-        <path
-          d="M16 24 C16 17 48 17 48 24 L50 45 C50 52 39 56 32 56 C25 56 14 52 14 45 Z"
-          fill="#1e293b"
-          stroke="#475569"
-          strokeWidth="1.5"
-        />
+          {/* Sayap Kiri (Mengepak saat diklik) */}
+          <g
+            style={{
+              transform: isExcited ? 'rotate(18deg)' : 'rotate(0deg)',
+              transformOrigin: '34px 55px',
+              transition: 'transform 0.25s ease',
+            }}
+          >
+            <path
+              d="M32 46 C20 52, 18 70, 28 80 C32 76, 35 64, 34 46 Z"
+              fill="#1e293b"
+              stroke="#64748b"
+              strokeWidth="1.5"
+            />
+            {/* Pola Circuit Cyan di Sayap */}
+            <path d="M25 60 L30 63 L27 71" stroke="#38bdf8" strokeWidth="1" strokeOpacity="0.75" />
+          </g>
 
-        {/* Geometric 3-Layered Wing / Chest Feathers */}
-        <path
-          d="M20 42 L32 47 L44 42 M22 46 L32 51 L42 46 M25 50 L32 54 L39 50"
-          stroke="#38bdf8"
-          strokeWidth="1.2"
-          strokeOpacity="0.65"
-          strokeLinecap="round"
-        />
+          {/* Sayap Kanan + Holographic Clipboard */}
+          <g
+            style={{
+              transform: isExcited ? 'rotate(-20deg)' : 'rotate(0deg)',
+              transformOrigin: '86px 55px',
+              transition: 'transform 0.25s ease',
+            }}
+          >
+            <path
+              d="M88 46 C100 52, 102 70, 92 80 C88 76, 85 64, 86 46 Z"
+              fill="#1e293b"
+              stroke="#64748b"
+              strokeWidth="1.5"
+            />
+            <path d="M95 60 L90 63 L93 71" stroke="#38bdf8" strokeWidth="1" strokeOpacity="0.75" />
 
-        {/*Varsity "12" Easter Egg / Cyber Core Accent */}
-        <circle cx="23" cy="48" r="1.3" fill="#facc15" />
-        <circle cx="41" cy="48" r="1.3" fill="#e11d48" />
+            {/* Mini Holographic Clipboard di Sayap Kanan */}
+            <rect
+              x="92"
+              y="54"
+              width="14"
+              height="18"
+              rx="2.5"
+              fill="#38bdf8"
+              fillOpacity="0.2"
+              stroke="#38bdf8"
+              strokeWidth="1.2"
+            />
+            <line x1="95" y1="59" x2="103" y2="59" stroke="#facc15" strokeWidth="1.2" />
+            <line x1="95" y1="63" x2="101" y2="63" stroke="#38bdf8" strokeWidth="1" />
+            <line x1="95" y1="67" x2="104" y2="67" stroke="#38bdf8" strokeWidth="1" />
+          </g>
 
-        {/* Facial Disc (Dark Charcoal Frame) */}
-        <path
-          d="M17 28 L25 23 L32 27 L39 23 L47 28 L45 38 L32 42 L19 38 Z"
-          fill="#0f172a"
-          stroke="#64748b"
-          strokeWidth="1.2"
-        />
+          {/* Tubuh Burung Hantu (Sturdy & Neat Charcoal Dark Grey) */}
+          <path
+            d="M32 36 C32 22, 88 22, 88 36 L90 74 C90 86, 76 91, 60 91 C44 91, 30 86, 30 74 Z"
+            fill="#1e293b"
+            stroke="#94a3b8"
+            strokeWidth="1.6"
+          />
 
-        {/* Left Eye (Viewer's Left): Hexagonal Glowing Neon Yellow (#facc15) */}
-        <polygon
-          points="24,28 28,30 28,35 24,37 20,35 20,30"
-          fill="#facc15"
-        />
-        <polygon
-          points="24,30.5 26,31.5 26,33.5 24,34.5 22,33.5 22,31.5"
-          fill="#070a14"
-        />
+          {/* Perut & 3 Lapisan Bulu Geometris Rapi */}
+          <path
+            d="M40 58 C40 50, 80 50, 80 58 L78 82 C78 88, 42 88, 42 82 Z"
+            fill="#0f172a"
+          />
+          <path
+            d="M46 64 L60 70 L74 64 M48 71 L60 77 L72 71 M51 78 L60 83 L69 78"
+            stroke="#38bdf8"
+            strokeWidth="1.2"
+            strokeOpacity="0.65"
+            strokeLinecap="round"
+          />
 
-        {/* Right Eye (Viewer's Right / Owl's Left): Hexagonal Glowing Neon Yellow */}
-        <polygon
-          points="40,28 44,30 44,35 40,37 36,35 36,30"
-          fill="#facc15"
-        />
-        <polygon
-          points="40,30.5 42,31.5 42,33.5 40,34.5 38,33.5 38,31.5"
-          fill="#070a14"
-        />
+          {/* Easter Egg "12" Kecil di Dada Kiri */}
+          <text x="43" y="62" fill="#facc15" fontSize="6" fontFamily="monospace" fontWeight="bold">
+            12
+          </text>
 
-        {/* Asymmetric Sci-Fi Holographic Visor (Over Owl's Left Eye / Viewer's Right) */}
-        <path
-          d="M33 26 L51 25 L49 38 L34 38 Z"
-          fill="#38bdf8"
-          fillOpacity="0.28"
-          stroke="#38bdf8"
-          strokeWidth="1.3"
-        />
-        {/* Visor HUD Crosshair */}
-        <line x1="36" y1="29" x2="47" y2="29" stroke="#38bdf8" strokeWidth="0.8" strokeOpacity="0.8" />
-        <circle cx="51" cy="31" r="2" fill="#38bdf8" />
+          {/* Telinga / Tanduk Great Horned Owl dengan Ujung Perak Metalik */}
+          <path d="M28 20 L44 31 L34 38 Z" fill="#1e293b" stroke="#cbd5e1" strokeWidth="1.4" />
+          <path d="M92 20 L76 31 L86 38 Z" fill="#1e293b" stroke="#cbd5e1" strokeWidth="1.4" />
+          <path d="M28 20 L35 25 L31 28 Z" fill="#e2e8f0" />
+          <path d="M92 20 L85 25 L89 28 Z" fill="#e2e8f0" />
 
-        {/* Gunmetal Sharp Beak */}
-        <polygon
-          points="29,35 35,35 32,43"
-          fill="#334155"
-          stroke="#cbd5e1"
-          strokeWidth="1"
-        />
-      </svg>
+          {/* Bingkai Wajah (Facial Disc) */}
+          <path
+            d="M33 40 L47 32 L60 38 L73 32 L87 40 L84 56 L60 62 L36 56 Z"
+            fill="#070a14"
+            stroke="#64748b"
+            strokeWidth="1.4"
+          />
+
+          {/* MATA KIRI & KANAN (Hexagonal Glowing Neon Yellow #facc15) */}
+          {isBlinking ? (
+            <>
+              <line x1="39" y1="46" x2="53" y2="46" stroke="#facc15" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="67" y1="46" x2="81" y2="46" stroke="#facc15" strokeWidth="2.5" strokeLinecap="round" />
+            </>
+          ) : (
+            <>
+              {/* Mata Kiri */}
+              <polygon
+                points="46,38 53,42 53,50 46,54 39,50 39,42"
+                fill="#facc15"
+              />
+              {/* Pupil Heksagonal Mengikuti Kursor */}
+              <circle
+                cx={46 + pupilPos.x}
+                cy={46 + pupilPos.y}
+                r="3.2"
+                fill="#070a14"
+              />
+              <circle
+                cx={44.8 + pupilPos.x * 0.5}
+                cy={44.5 + pupilPos.y * 0.5}
+                r="1"
+                fill="#ffffff"
+              />
+
+              {/* Mata Kanan */}
+              <polygon
+                points="74,38 81,42 81,50 74,54 67,50 67,42"
+                fill="#facc15"
+              />
+              <circle
+                cx={74 + pupilPos.x}
+                cy={46 + pupilPos.y}
+                r="3.2"
+                fill="#070a14"
+              />
+              <circle
+                cx={72.8 + pupilPos.x * 0.5}
+                cy={44.5 + pupilPos.y * 0.5}
+                r="1"
+                fill="#ffffff"
+              />
+            </>
+          )}
+
+          {/* Visor Holografik Asimetris di Sebelah Kiri Mata Burung Hantu (Kanan Layar) */}
+          <path
+            d="M63 35 L91 33 L88 55 L64 55 Z"
+            fill="#38bdf8"
+            fillOpacity="0.24"
+            stroke="#38bdf8"
+            strokeWidth="1.4"
+          />
+          <line x1="67" y1="40" x2="85" y2="39" stroke="#38bdf8" strokeWidth="0.9" strokeOpacity="0.8" />
+          <circle cx="90" cy="44" r="2.5" fill="#38bdf8" />
+
+          {/* Paruh Gunmetal Melengkung Tajam */}
+          <polygon points="56,49 64,49 60,59" fill="#475569" stroke="#e2e8f0" strokeWidth="1.2" />
+
+          {/* Cakar Mencengkeram Ranting */}
+          <path
+            d="M47 89 L47 94 M50 89 L50 94 M70 89 L70 94 M73 89 L73 94"
+            stroke="#facc15"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        {/* Label Interaktif Kecil */}
+        <span className=" -mt-1 px-2.5 py-0.5 rounded-full bg-[#0f172a]/90 border border-[#818cf8]/30 group-hover:border-[#facc15] text-[10px] font-mono text-[#cbd5e1] group-hover:text-[#facc15] transition shadow-xs">
+          🦉 Orix • Klik untuk sapa
+        </span>
+      </button>
     </div>
   );
 }

@@ -5,12 +5,12 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
-  BarChart,
+  Layers,
   Check,
   X,
 } from 'lucide-react';
 import SocialIcon from './SocialIcon';
-import { BracketTechBadge } from './SpecialEffects';
+import { SectionPillTag, CardStepHeader } from './SpecialEffects';
 import { autoDetectIcon, compressImageFile } from '../data/defaultState';
 
 export default function LinksEditor({ links, setLinks, showToast }) {
@@ -86,7 +86,6 @@ export default function LinksEditor({ links, setLinks, showToast }) {
     setLinks(updated);
   };
 
-  // Drag and Drop handlers
   const onDragStart = (e, index) => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
@@ -105,23 +104,32 @@ export default function LinksEditor({ links, setLinks, showToast }) {
 
   return (
     <section className="space-y-5">
-      <div className="maghrib-glass tech-corner-box rounded-3xl p-5 sm:p-6 space-y-5">
-        {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <BracketTechBadge accent="sky">LINKS // SYSTEM</BracketTechBadge>
-              <h2 className="text-base sm:text-lg font-extrabold text-[#facc15] tracking-tight italic">
-                DAFTAR TAUTAN AKTIF
-              </h2>
-            </div>
-            <p className="text-xs text-[#cbd5e1]">
-              Geser kartu atau gunakan tombol panah untuk mengatur urutan. Klik ikon untuk upload logo kustom.
+      {/* SECTION HEADER (Mengacu pada Referensi Desain Minimalis) */}
+      <div className="space-y-2">
+        <SectionPillTag code="01" label="MANAJEMEN TAUTAN" />
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Daftar Tautan & Navigasi
+            </h1>
+            <p className="text-xs text-[#cbd5e1] mt-0.5">
+              Geser kartu untuk mengatur urutan, atau klik ikon untuk mengganti gambar logo.
             </p>
           </div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0f172a]/90 border border-slate-700 text-xs font-mono text-[#cbd5e1] self-start sm:self-auto">
+            <Layers className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <span>{links.length} Tautan Tersimpan</span>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTAINER CARD */}
+      <div className="maghrib-card rounded-3xl p-5 sm:p-6 space-y-5">
+        <div className="flex items-center justify-between gap-3">
+          <CardStepHeader number="01" category="DAFTAR ITEM TAUTAN" status="" />
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-[0_0_15px_rgba(250,204,21,0.3)] shrink-0 self-start sm:self-auto"
+            className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] border-2 border-[#070a14] shadow-[2px_2px_0px_#04060e] text-xs font-bold flex items-center gap-1.5 transition shrink-0"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Tambah Tautan</span>
@@ -132,11 +140,11 @@ export default function LinksEditor({ links, setLinks, showToast }) {
         {showAddForm && (
           <form
             onSubmit={handleAddNew}
-            className="p-4 rounded-2xl bg-[#070a14]/80 border border-[#facc15]/40 space-y-3 transition-all shadow-inner"
+            className="tactile-box p-4 rounded-2xl space-y-3"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-[#facc15] mb-1">
+                <label className="block text-xs font-semibold text-[#cbd5e1] mb-1">
                   Judul Tombol
                 </label>
                 <input
@@ -144,20 +152,20 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                   placeholder="Contoh: Portofolio GitHub"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#0f172a] border border-[#818cf8]/30 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#facc15] transition"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#070a14] border border-slate-700 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#facc15]"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#38bdf8] mb-1">
-                  URL Tujuan (Wajib https://)
+                <label className="block text-xs font-semibold text-[#cbd5e1] mb-1">
+                  URL Tujuan
                 </label>
                 <input
                   type="text"
                   placeholder="https://github.com/username"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#0f172a] border border-[#818cf8]/30 text-sm font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-[#38bdf8] transition"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#070a14] border border-slate-700 text-sm font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-[#facc15]"
                 />
               </div>
             </div>
@@ -171,9 +179,9 @@ export default function LinksEditor({ links, setLinks, showToast }) {
               </button>
               <button
                 type="submit"
-                className="px-5 py-1.5 rounded-full bg-[#facc15] text-[#070a14] text-xs font-bold hover:bg-[#fde047] transition shadow-[0_0_10px_rgba(250,204,21,0.3)]"
+                className="px-4 py-1.5 rounded-full bg-[#facc15] text-[#070a14] text-xs font-bold hover:bg-[#fde047]"
               >
-                Simpan Tautan
+                Simpan
               </button>
             </div>
           </form>
@@ -182,7 +190,7 @@ export default function LinksEditor({ links, setLinks, showToast }) {
         {/* LIST TAUTAN */}
         <div className="space-y-3">
           {links.length === 0 ? (
-            <div className="text-center py-12 text-[#cbd5e1]/60 text-sm border border-dashed border-[#818cf8]/25 rounded-2xl">
+            <div className="text-center py-10 text-slate-400 text-xs border border-dashed border-slate-700 rounded-2xl">
               Belum ada tautan. Klik tombol <strong className="text-[#facc15]">+ Tambah Tautan</strong> di atas.
             </div>
           ) : (
@@ -193,13 +201,13 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                 onDragStart={(e) => onDragStart(e, idx)}
                 onDragOver={onDragOver}
                 onDrop={(e) => onDrop(e, idx)}
-                className={`group bg-[#0f172a]/75 hover:bg-[#0f172a] rounded-2xl p-3.5 border border-[#818cf8]/25 hover:border-[#facc15]/60 flex items-start sm:items-center gap-3 transition-all shadow-sm ${
+                className={`tactile-box rounded-2xl p-3.5 flex items-start sm:items-center gap-3 ${
                   draggedIndex === idx ? 'opacity-40 border-dashed border-[#facc15]' : ''
                 }`}
               >
-                {/* Drag Handle & Order Controls */}
-                <div className="flex flex-col items-center gap-1 text-[#cbd5e1]/50 shrink-0">
-                  <span className="cursor-grab hover:text-[#facc15] transition" title="Geser untuk atur urutan">
+                {/* Drag Handle */}
+                <div className="flex flex-col items-center gap-1 text-slate-500 shrink-0">
+                  <span className="cursor-grab hover:text-[#facc15] transition" title="Geser urutan">
                     <GripVertical className="w-4 h-4" />
                   </span>
                   <div className="flex flex-col sm:hidden">
@@ -222,8 +230,8 @@ export default function LinksEditor({ links, setLinks, showToast }) {
 
                 {/* Upload / Ganti Logo */}
                 <label
-                  className="w-12 h-12 rounded-2xl bg-[#070a14] border border-[#38bdf8]/35 flex items-center justify-center cursor-pointer overflow-hidden group/icon relative shrink-0 shadow-inner hover:border-[#facc15] transition"
-                  title="Klik untuk upload logo kustom"
+                  className="w-11 h-11 rounded-xl bg-[#070a14] border border-slate-700 flex items-center justify-center cursor-pointer overflow-hidden group/icon relative shrink-0 hover:border-[#facc15] transition"
+                  title="Klik untuk ganti ikon"
                 >
                   <input
                     type="file"
@@ -235,22 +243,22 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                     <SocialIcon
                       type={item.iconType}
                       value={item.iconValue}
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                     />
                   </div>
-                  <div className="absolute inset-0 bg-[#070a14]/85 hidden group-hover/icon:flex items-center justify-center text-[#facc15] text-[9px] font-bold tracking-wider backdrop-blur-xs">
-                    GANTI
+                  <div className="absolute inset-0 bg-black/80 hidden group-hover/icon:flex items-center justify-center text-[#facc15] text-[8px] font-mono font-bold">
+                    EDIT
                   </div>
                 </label>
 
                 {/* Inputs: Title & URL */}
-                <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex-1 min-w-0 space-y-0.5">
                   <input
                     type="text"
                     value={item.title}
                     onChange={(e) => updateLink(idx, 'title', e.target.value)}
                     placeholder="Judul Tautan"
-                    className="font-bold text-sm text-white bg-transparent focus:bg-[#070a14] focus:px-2.5 py-0.5 rounded-lg border border-transparent focus:border-[#facc15]/60 outline-none w-full transition"
+                    className="font-bold text-sm text-white bg-transparent focus:bg-[#070a14] focus:px-2 py-0.5 rounded-lg border border-transparent focus:border-[#facc15]/60 outline-none w-full transition"
                   />
                   <input
                     type="url"
@@ -268,35 +276,32 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                       setLinks(updated);
                     }}
                     placeholder="https://..."
-                    className="text-xs text-[#38bdf8]/90 font-mono bg-transparent focus:bg-[#070a14] focus:px-2.5 py-0.5 rounded-lg border border-transparent focus:border-[#38bdf8]/60 outline-none w-full transition"
+                    className="text-xs text-slate-400 font-mono bg-transparent focus:bg-[#070a14] focus:px-2 py-0.5 rounded-lg border border-transparent focus:border-slate-600 outline-none w-full transition"
                   />
                 </div>
 
-                {/* Stat Clicks & Action Buttons */}
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2.5 py-1 rounded-full bg-[#070a14] text-[#cbd5e1] border border-[#818cf8]/25">
-                    <BarChart className="w-3 h-3 text-[#facc15]" />
+                {/* Clicks & Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-[#070a14] border border-slate-800 text-[10px] font-mono text-slate-400">
                     {item.clicks || 0} klik
                   </span>
 
-                  {/* Toggle Active */}
                   <button
                     onClick={() => updateLink(idx, 'enabled', !item.enabled)}
-                    className={`p-2 rounded-full text-xs border transition ${
+                    className={`px-2 py-1 rounded-md text-[10px] font-mono font-bold border transition ${
                       item.enabled
-                        ? 'text-emerald-300 bg-emerald-500/15 border-emerald-500/40 hover:border-[#facc15]'
-                        : 'text-slate-500 bg-[#070a14] border-slate-700 hover:border-slate-500'
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                        : 'bg-slate-900 text-slate-500 border-slate-700'
                     }`}
-                    title={item.enabled ? 'Tautan Aktif' : 'Tautan Disembunyikan'}
+                    title={item.enabled ? 'Klik untuk sembunyikan' : 'Klik untuk aktifkan'}
                   >
-                    {item.enabled ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                    {item.enabled ? 'AKTIF' : 'OFF'}
                   </button>
 
-                  {/* Delete Button */}
                   <button
                     onClick={() => deleteLink(idx)}
-                    className="text-slate-400 hover:text-[#e11d48] p-2 rounded-full hover:bg-[#e11d48]/15 border border-transparent hover:border-[#e11d48]/40 transition"
-                    title="Hapus tautan ini"
+                    className="text-slate-500 hover:text-[#e11d48] p-1.5 rounded-lg hover:bg-[#e11d48]/10 transition"
+                    title="Hapus tautan"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
