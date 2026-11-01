@@ -38,7 +38,7 @@ export default function ExportModal({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `opiklink-config-${slug || 'backup'}.json`;
+    a.download = `opikz-config-${slug || 'backup'}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -69,14 +69,14 @@ export default function ExportModal({
     const activeLinks = links.filter((l) => l.enabled !== false);
     const bgStyle =
       appearance.bgMode === 'image' && appearance.customImageData
-        ? `background: linear-gradient(rgba(0,0,0,${
+        ? `background: linear-gradient(rgba(7,10,20,${
             (appearance.imageOverlayOpacity || 45) / 100
-          }), rgba(0,0,0,${
+          }), rgba(31,20,48,${
             (appearance.imageOverlayOpacity || 45) / 100
           })), url('${appearance.customImageData}'); background-size: cover; background-position: center; background-attachment: fixed;`
         : appearance.bgMode === 'solid'
-        ? `background-color: ${appearance.solidBgColor || '#090D16'};`
-        : `background: linear-gradient(-45deg, #090D16, #0D3B2E, #1E1B4B, #064E3B, #311042); background-size: 300% 300%; animation: aurora 12s ease infinite;`;
+        ? `background-color: ${appearance.solidBgColor || '#070a14'};`
+        : `background: linear-gradient(180deg, #070a14 0%, #131129 50%, #1f1430 100%); background-size: 300% 300%; animation: aurora 12s ease infinite;`;
 
     const htmlStr = `<!DOCTYPE html>
 <html lang="id">
@@ -86,7 +86,7 @@ export default function ExportModal({
   <title>${profile.name || 'Link in Bio'}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body {
@@ -116,22 +116,24 @@ export default function ExportModal({
       border-radius: 28px;
       object-fit: cover;
       margin-bottom: 16px;
-      border: 2px solid rgba(255,255,255,0.25);
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+      border: 2px solid #facc15;
+      box-shadow: 0 0 25px rgba(250,204,21,0.25);
     }
     h1 {
       font-size: 22px;
       margin: 0 0 4px;
+      color: #facc15;
       letter-spacing: -0.02em;
     }
     .role {
       font-size: 13px;
-      opacity: 0.85;
+      color: #38bdf8;
       margin: 0 0 8px;
+      font-family: monospace;
     }
     .bio {
       font-size: 13px;
-      opacity: 0.8;
+      color: #cbd5e1;
       margin: 0 auto 32px;
       line-height: 1.5;
     }
@@ -147,25 +149,22 @@ export default function ExportModal({
       justify-content: space-between;
       gap: 14px;
       padding: 14px 18px;
-      border-radius: 18px;
-      background: ${appearance.cardBgColor || 'rgba(255,255,255,0.12)'};
-      color: ${appearance.cardTextColor || '#FFFFFF'};
-      border: 1px solid rgba(255,255,255,0.20);
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.80);
+      color: #FFFFFF;
+      border: 1px solid rgba(129, 140, 248, 0.30);
       text-decoration: none;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.25s ease;
     }
     .link-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-    .link-card:active {
-      transform: scale(0.98);
+      border-color: #facc15;
+      box-shadow: 0 0 18px rgba(250,204,21,0.25);
     }
     .link-title {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
       flex: 1;
       overflow: hidden;
@@ -175,8 +174,9 @@ export default function ExportModal({
     .icon-box {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.18);
+      border-radius: 9999px;
+      background: #070a14;
+      border: 1px solid rgba(56,189,248,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -189,13 +189,15 @@ export default function ExportModal({
       object-fit: cover;
     }
     .arrow {
-      opacity: 0.6;
-      font-size: 16px;
+      color: #e11d48;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 13px;
     }
     footer {
       margin-top: 48px;
       font-size: 11px;
-      opacity: 0.45;
+      opacity: 0.6;
       text-align: center;
     }
   </style>
@@ -204,7 +206,7 @@ export default function ExportModal({
   <div class="container">
     <img src="${profile.avatar}" alt="${profile.name}" class="avatar">
     <h1>${profile.name}</h1>
-    ${profile.role ? `<p class="role">${profile.role}</p>` : ''}
+    ${profile.role ? `<p class="role">&gt; ${profile.role}</p>` : ''}
     ${profile.bio ? `<p class="bio">${profile.bio}</p>` : ''}
     
     <div class="links-list">
@@ -216,18 +218,18 @@ export default function ExportModal({
           ${
             l.iconType === 'custom' && l.iconValue
               ? `<img src="${l.iconValue}" alt="icon">`
-              : `<span>🌐</span>`
+              : `<span>⚡</span>`
           }
         </div>
         <div class="link-title">${l.title}</div>
-        <span class="arrow">↗</span>
+        <span class="arrow">[↗]</span>
       </a>`
         )
         .join('')}
     </div>
 
     <footer>
-      <p>© ${new Date().getFullYear()} ${profile.name}. Dibuat dengan OpikLink.</p>
+      <p>© ${new Date().getFullYear()} ${profile.name} • [ OPIKZ // ORIX STUDIO ]</p>
     </footer>
   </div>
 </body>
@@ -247,18 +249,20 @@ export default function ExportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="maghrib-glass tech-corner-box bg-[#070a14]/95 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-[#818cf8]/30 text-white max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-bold text-zinc-900">Publikasi & Download</h3>
-            <p className="text-xs text-zinc-500">
-              Opsi publikasi langsung atau ekspor file untuk GitHub Pages.
+            <h3 className="text-base font-extrabold text-[#facc15] tracking-tight italic">
+              PUBLIKASI & DOWNLOAD
+            </h3>
+            <p className="text-xs text-[#cbd5e1]">
+              Opsi publikasi langsung atau ekspor file konfigurasi.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition"
+            className="p-1.5 rounded-full text-[#cbd5e1] hover:text-[#facc15] hover:bg-white/10 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -266,17 +270,17 @@ export default function ExportModal({
 
         {/* TAUTAN PUBLIK VS EDITOR */}
         <div className="space-y-3">
-          <div className="p-4 rounded-2xl border border-zinc-200/90 bg-zinc-50 space-y-2">
+          <div className="p-4 rounded-2xl border border-[#818cf8]/30 bg-[#0f172a]/85 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-purple-600" />
-                Tautan Profil Publik (Untuk Pengunjung / Bio Instagram)
+              <label className="text-xs font-bold text-[#facc15] flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-[#38bdf8]" />
+                Tautan Profil Publik (Untuk Pengunjung / Bio)
               </label>
-              <span className="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">
-                Mode Preview
+              <span className="text-[10px] font-mono bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/35 font-bold px-2 py-0.5 rounded-full">
+                [PUBLIC]
               </span>
             </div>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-[#cbd5e1]">
               Bagikan link ini ke publik. Pengunjung otomatis melihat halaman profil tanpa panel editor.
             </p>
             <div className="flex items-center gap-2">
@@ -284,21 +288,21 @@ export default function ExportModal({
                 type="text"
                 readOnly
                 value={publicUrl}
-                className="flex-1 px-3 py-2 rounded-xl bg-white border border-zinc-300 text-xs font-mono text-zinc-600 outline-none"
+                className="flex-1 px-3 py-2 rounded-full bg-[#070a14] border border-[#818cf8]/30 text-xs font-mono text-[#38bdf8] outline-none"
               />
               <button
                 onClick={() => handleCopyLink(publicUrl, true)}
-                className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+                className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs font-bold flex items-center gap-1.5 transition shrink-0"
               >
-                {copiedPublic ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                {copiedPublic ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedPublic ? 'Tersalin' : 'Salin'}</span>
               </button>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-2xl border border-zinc-200/90 bg-zinc-50/70 space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
-              <Edit3 className="w-3.5 h-3.5 text-zinc-600" />
+          <div className="p-3.5 rounded-2xl border border-[#818cf8]/20 bg-[#0f172a]/60 space-y-1.5">
+            <label className="text-xs font-semibold text-[#cbd5e1] flex items-center gap-1.5">
+              <Edit3 className="w-3.5 h-3.5 text-[#facc15]" />
               Tautan Khusus Mode Editor (Untuk Anda Sendiri)
             </label>
             <div className="flex items-center gap-2">
@@ -306,13 +310,13 @@ export default function ExportModal({
                 type="text"
                 readOnly
                 value={editorUrl}
-                className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-zinc-200 text-xs font-mono text-zinc-500 outline-none"
+                className="flex-1 px-3 py-1.5 rounded-full bg-[#070a14] border border-[#818cf8]/25 text-xs font-mono text-[#cbd5e1] outline-none"
               />
               <button
                 onClick={() => handleCopyLink(editorUrl, false)}
-                className="px-3 py-1.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition shrink-0"
+                className="ghost-pill-btn px-3.5 py-1.5 text-white text-xs font-semibold flex items-center gap-1.5 shrink-0"
               >
-                {copiedEditor ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedEditor ? <Check className="w-3.5 h-3.5 text-[#facc15]" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedEditor ? 'Tersalin' : 'Salin'}</span>
               </button>
             </div>
@@ -320,29 +324,27 @@ export default function ExportModal({
         </div>
 
         {/* CADANGKAN & PULIHKAN DATA JSON */}
-        <div className="p-4 rounded-2xl border border-blue-200/80 bg-blue-50/40 space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
-                <FileJson className="w-4 h-4 text-blue-600" />
-                Cadangkan & Pulihkan Konfigurasi (.json)
-              </h4>
-              <p className="text-[11px] text-zinc-500 mt-0.5">
-                Pindahkan tampilan Anda antar-browser/perangkat dalam 1 klik tanpa hilang.
-              </p>
-            </div>
+        <div className="p-4 rounded-2xl border border-[#38bdf8]/30 bg-[#0f172a]/80 space-y-2">
+          <div>
+            <h4 className="text-xs font-bold text-[#38bdf8] flex items-center gap-1.5">
+              <FileJson className="w-4 h-4 text-[#facc15]" />
+              Cadangkan & Pulihkan Konfigurasi (.json)
+            </h4>
+            <p className="text-[11px] text-[#cbd5e1] mt-0.5">
+              Pindahkan tampilan Anda antar-browser/perangkat dalam 1 klik tanpa hilang.
+            </p>
           </div>
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={handleDownloadBackup}
-              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition shadow-2xs"
+              className="ghost-pill-btn flex-1 py-2 px-3 text-white text-xs font-semibold flex items-center justify-center gap-1.5"
             >
-              <Download className="w-3.5 h-3.5 text-blue-600" />
+              <Download className="w-3.5 h-3.5 text-[#38bdf8]" />
               <span>Unduh Cadangan (.json)</span>
             </button>
 
-            <label className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs">
-              <Upload className="w-3.5 h-3.5 text-emerald-600" />
+            <label className="ghost-pill-btn flex-1 py-2 px-3 text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5 text-[#facc15]" />
               <span>Pulihkan Cadangan</span>
               <input
                 type="file"
@@ -355,32 +357,32 @@ export default function ExportModal({
         </div>
 
         {/* DOWNLOAD STANDALONE HTML */}
-        <div className="p-4 rounded-2xl border border-zinc-200/90 bg-zinc-50 flex items-center justify-between gap-4">
+        <div className="p-4 rounded-2xl border border-[#818cf8]/25 bg-[#0f172a]/75 flex items-center justify-between gap-4">
           <div>
-            <h4 className="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
-              <Download className="w-4 h-4 text-emerald-600" />
+            <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+              <Download className="w-4 h-4 text-[#facc15]" />
               Unduh Standalone HTML
             </h4>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              File HTML mandiri satu halaman yang siap di-hosting langsung di mana saja.
+            <p className="text-xs text-[#cbd5e1] mt-0.5">
+              File HTML mandiri satu halaman yang siap di-hosting di mana saja.
             </p>
           </div>
           <button
             onClick={downloadStandaloneHtml}
-            className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold shrink-0 transition shadow-xs"
+            className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs font-bold shrink-0 transition shadow-[0_0_12px_rgba(250,204,21,0.3)]"
           >
             Unduh HTML
           </button>
         </div>
 
         {/* PANDUAN GITHUB PAGES */}
-        <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/70 text-xs text-purple-900 space-y-1.5">
-          <p className="font-bold flex items-center gap-1.5">
-            <Code2 className="w-4 h-4" />
+        <div className="p-3.5 rounded-2xl bg-[#1f1430]/70 border border-[#818cf8]/30 text-xs text-[#cbd5e1] space-y-1">
+          <p className="font-bold text-[#facc15] flex items-center gap-1.5">
+            <Code2 className="w-4 h-4 text-[#38bdf8]" />
             Deploy Otomatis ke GitHub Pages:
           </p>
-          <p className="text-purple-800">
-            Cukup jalankan <code className="bg-purple-200/60 px-1.5 py-0.5 rounded font-mono">npm run build</code> lalu upload folder <code className="bg-purple-200/60 px-1.5 py-0.5 rounded font-mono">dist</code> ke branch <code className="bg-purple-200/60 px-1.5 py-0.5 rounded font-mono">gh-pages</code> di repository GitHub Anda!
+          <p>
+            Jalankan <code className="bg-[#070a14] text-[#38bdf8] px-1.5 py-0.5 rounded font-mono">npm run deploy</code> untuk mempublikasikan ke branch <code className="bg-[#070a14] text-[#facc15] px-1.5 py-0.5 rounded font-mono">gh-pages</code>.
           </p>
         </div>
       </div>

@@ -5,12 +5,12 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
-  Upload,
   BarChart,
   Check,
   X,
 } from 'lucide-react';
 import SocialIcon from './SocialIcon';
+import { BracketTechBadge } from './SpecialEffects';
 import { autoDetectIcon, compressImageFile } from '../data/defaultState';
 
 export default function LinksEditor({ links, setLinks, showToast }) {
@@ -105,20 +105,25 @@ export default function LinksEditor({ links, setLinks, showToast }) {
 
   return (
     <section className="space-y-5">
-      <div className="bg-white rounded-2xl p-5 border border-zinc-200/80 shadow-2xs">
+      <div className="maghrib-glass tech-corner-box rounded-3xl p-5 sm:p-6 space-y-5">
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-base font-bold text-zinc-900">Daftar Tautan</h2>
-            <p className="text-xs text-zinc-500">
-              Geser kartu atau gunakan tombol panah untuk mengatur urutan. Klik logo untuk ganti gambar.
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <BracketTechBadge accent="sky">LINKS // SYSTEM</BracketTechBadge>
+              <h2 className="text-base sm:text-lg font-extrabold text-[#facc15] tracking-tight italic">
+                DAFTAR TAUTAN AKTIF
+              </h2>
+            </div>
+            <p className="text-xs text-[#cbd5e1]">
+              Geser kartu atau gunakan tombol panah untuk mengatur urutan. Klik ikon untuk upload logo kustom.
             </p>
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs sm:text-sm font-medium flex items-center gap-1.5 transition shadow-xs shrink-0"
+            className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-[0_0_15px_rgba(250,204,21,0.3)] shrink-0 self-start sm:self-auto"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Tambah Tautan</span>
           </button>
         </div>
@@ -127,32 +132,32 @@ export default function LinksEditor({ links, setLinks, showToast }) {
         {showAddForm && (
           <form
             onSubmit={handleAddNew}
-            className="mb-5 p-4 rounded-xl bg-zinc-50 border border-zinc-200 space-y-3 transition-all"
+            className="p-4 rounded-2xl bg-[#070a14]/80 border border-[#facc15]/40 space-y-3 transition-all shadow-inner"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-700 mb-1">
+                <label className="block text-xs font-semibold text-[#facc15] mb-1">
                   Judul Tombol
                 </label>
                 <input
                   type="text"
-                  placeholder="Contoh: Portofolio Terbaru"
+                  placeholder="Contoh: Portofolio GitHub"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-zinc-300 text-sm focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#0f172a] border border-[#818cf8]/30 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#facc15] transition"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-700 mb-1">
+                <label className="block text-xs font-semibold text-[#38bdf8] mb-1">
                   URL Tujuan (Wajib https://)
                 </label>
                 <input
                   type="text"
-                  placeholder="https://instagram.com/username"
+                  placeholder="https://github.com/username"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-zinc-300 text-sm font-mono focus:outline-none focus:border-zinc-900"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#0f172a] border border-[#818cf8]/30 text-sm font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-[#38bdf8] transition"
                 />
               </div>
             </div>
@@ -160,13 +165,13 @@ export default function LinksEditor({ links, setLinks, showToast }) {
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 hover:bg-zinc-200/60"
+                className="ghost-pill-btn px-4 py-1.5 text-xs font-semibold text-[#cbd5e1]"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800"
+                className="px-5 py-1.5 rounded-full bg-[#facc15] text-[#070a14] text-xs font-bold hover:bg-[#fde047] transition shadow-[0_0_10px_rgba(250,204,21,0.3)]"
               >
                 Simpan Tautan
               </button>
@@ -177,8 +182,8 @@ export default function LinksEditor({ links, setLinks, showToast }) {
         {/* LIST TAUTAN */}
         <div className="space-y-3">
           {links.length === 0 ? (
-            <div className="text-center py-12 text-zinc-400 text-sm">
-              Belum ada tautan. Klik tombol <strong>+ Tambah Tautan</strong> di atas.
+            <div className="text-center py-12 text-[#cbd5e1]/60 text-sm border border-dashed border-[#818cf8]/25 rounded-2xl">
+              Belum ada tautan. Klik tombol <strong className="text-[#facc15]">+ Tambah Tautan</strong> di atas.
             </div>
           ) : (
             links.map((item, idx) => (
@@ -188,27 +193,27 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                 onDragStart={(e) => onDragStart(e, idx)}
                 onDragOver={onDragOver}
                 onDrop={(e) => onDrop(e, idx)}
-                className={`group bg-zinc-50/70 hover:bg-white rounded-xl p-3 border border-zinc-200/90 flex items-start sm:items-center gap-3 transition shadow-2xs ${
-                  draggedIndex === idx ? 'opacity-40 border-dashed border-zinc-400' : ''
+                className={`group bg-[#0f172a]/75 hover:bg-[#0f172a] rounded-2xl p-3.5 border border-[#818cf8]/25 hover:border-[#facc15]/60 flex items-start sm:items-center gap-3 transition-all shadow-sm ${
+                  draggedIndex === idx ? 'opacity-40 border-dashed border-[#facc15]' : ''
                 }`}
               >
                 {/* Drag Handle & Order Controls */}
-                <div className="flex flex-col items-center gap-1 text-zinc-400 shrink-0">
-                  <span className="cursor-grab hover:text-zinc-700" title="Geser untuk atur urutan">
+                <div className="flex flex-col items-center gap-1 text-[#cbd5e1]/50 shrink-0">
+                  <span className="cursor-grab hover:text-[#facc15] transition" title="Geser untuk atur urutan">
                     <GripVertical className="w-4 h-4" />
                   </span>
                   <div className="flex flex-col sm:hidden">
                     <button
                       onClick={() => moveLink(idx, idx - 1)}
                       disabled={idx === 0}
-                      className="disabled:opacity-20 hover:text-zinc-800"
+                      className="disabled:opacity-20 hover:text-[#facc15]"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => moveLink(idx, idx + 1)}
                       disabled={idx === links.length - 1}
-                      className="disabled:opacity-20 hover:text-zinc-800"
+                      className="disabled:opacity-20 hover:text-[#facc15]"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -217,7 +222,7 @@ export default function LinksEditor({ links, setLinks, showToast }) {
 
                 {/* Upload / Ganti Logo */}
                 <label
-                  className="w-12 h-12 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center cursor-pointer overflow-hidden group/icon relative shrink-0 shadow-2xs hover:border-zinc-400 transition"
+                  className="w-12 h-12 rounded-2xl bg-[#070a14] border border-[#38bdf8]/35 flex items-center justify-center cursor-pointer overflow-hidden group/icon relative shrink-0 shadow-inner hover:border-[#facc15] transition"
                   title="Klik untuk upload logo kustom"
                 >
                   <input
@@ -226,14 +231,14 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                     className="hidden"
                     onChange={(e) => handleCustomLogoUpload(e, idx)}
                   />
-                  <div className="text-zinc-700">
+                  <div className="text-[#38bdf8] group-hover/icon:text-[#facc15] transition">
                     <SocialIcon
                       type={item.iconType}
                       value={item.iconValue}
                       className="w-6 h-6"
                     />
                   </div>
-                  <div className="absolute inset-0 bg-black/60 hidden group-hover/icon:flex items-center justify-center text-white text-[9px] font-bold tracking-wider backdrop-blur-xs">
+                  <div className="absolute inset-0 bg-[#070a14]/85 hidden group-hover/icon:flex items-center justify-center text-[#facc15] text-[9px] font-bold tracking-wider backdrop-blur-xs">
                     GANTI
                   </div>
                 </label>
@@ -245,7 +250,7 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                     value={item.title}
                     onChange={(e) => updateLink(idx, 'title', e.target.value)}
                     placeholder="Judul Tautan"
-                    className="font-semibold text-sm text-zinc-900 bg-transparent focus:bg-white focus:px-2 rounded border border-transparent focus:border-zinc-300 outline-none w-full transition"
+                    className="font-bold text-sm text-white bg-transparent focus:bg-[#070a14] focus:px-2.5 py-0.5 rounded-lg border border-transparent focus:border-[#facc15]/60 outline-none w-full transition"
                   />
                   <input
                     type="url"
@@ -263,24 +268,24 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                       setLinks(updated);
                     }}
                     placeholder="https://..."
-                    className="text-xs text-zinc-500 font-mono bg-transparent focus:bg-white focus:px-2 rounded border border-transparent focus:border-zinc-300 outline-none w-full transition"
+                    className="text-xs text-[#38bdf8]/90 font-mono bg-transparent focus:bg-[#070a14] focus:px-2.5 py-0.5 rounded-lg border border-transparent focus:border-[#38bdf8]/60 outline-none w-full transition"
                   />
                 </div>
 
                 {/* Stat Clicks & Action Buttons */}
-                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/70 text-zinc-700">
-                    <BarChart className="w-3 h-3 text-zinc-500" />
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2.5 py-1 rounded-full bg-[#070a14] text-[#cbd5e1] border border-[#818cf8]/25">
+                    <BarChart className="w-3 h-3 text-[#facc15]" />
                     {item.clicks || 0} klik
                   </span>
 
                   {/* Toggle Active */}
                   <button
                     onClick={() => updateLink(idx, 'enabled', !item.enabled)}
-                    className={`p-1.5 rounded-lg text-xs transition ${
+                    className={`p-2 rounded-full text-xs border transition ${
                       item.enabled
-                        ? 'text-emerald-700 bg-emerald-100 hover:bg-emerald-200'
-                        : 'text-zinc-400 bg-zinc-100 hover:bg-zinc-200'
+                        ? 'text-emerald-300 bg-emerald-500/15 border-emerald-500/40 hover:border-[#facc15]'
+                        : 'text-slate-500 bg-[#070a14] border-slate-700 hover:border-slate-500'
                     }`}
                     title={item.enabled ? 'Tautan Aktif' : 'Tautan Disembunyikan'}
                   >
@@ -290,7 +295,7 @@ export default function LinksEditor({ links, setLinks, showToast }) {
                   {/* Delete Button */}
                   <button
                     onClick={() => deleteLink(idx)}
-                    className="text-zinc-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition"
+                    className="text-slate-400 hover:text-[#e11d48] p-2 rounded-full hover:bg-[#e11d48]/15 border border-transparent hover:border-[#e11d48]/40 transition"
                     title="Hapus tautan ini"
                   >
                     <Trash2 className="w-4 h-4" />

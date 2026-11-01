@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Flame, Check, Database, ExternalLink, RefreshCw, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { X, Flame, Check, RefreshCw, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { getStoredFirebaseConfig } from '../firebase/config';
 import { saveBioToCloud } from '../firebase/bioService';
 import { getCurrentFirebaseUser } from '../firebase/authService';
@@ -30,11 +30,9 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
 
     try {
       let parsed = null;
-      // 1. Coba parse JSON murni
       try {
         parsed = JSON.parse(configText);
       } catch (err) {
-        // 2. Ekstrak field satu per satu jika user paste kode javascript
         const fields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId', 'measurementId'];
         const extracted = {};
         for (const f of fields) {
@@ -57,14 +55,12 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
       setIsConnected(true);
       showToast('Konfigurasi Firebase tersimpan!');
 
-      // Cek apakah user sudah login
       if (!getCurrentFirebaseUser()) {
         showToast('Konfigurasi siap! Silakan Login Admin untuk menyinkronkan data.');
         if (onConnected) onConnected();
         return;
       }
 
-      // Langsung sinkronkan data saat ini ke cloud jika sudah login
       setSaving(true);
       try {
         await saveBioToCloud(currentState, currentState.slug || 'lutfi');
@@ -90,23 +86,25 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="maghrib-glass tech-corner-box bg-[#070a14]/95 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#818cf8]/30 text-white">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-              <Flame className="w-6 h-6 fill-amber-500" />
+            <div className="w-10 h-10 rounded-2xl bg-[#facc15]/15 text-[#facc15] border border-[#facc15]/40 flex items-center justify-center">
+              <Flame className="w-6 h-6 fill-[#facc15]" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-zinc-900">Database Cloud Firebase</h3>
-              <p className="text-xs text-zinc-500">
+              <h3 className="text-base font-extrabold text-[#facc15] tracking-tight italic">
+                DATABASE CLOUD FIREBASE
+              </h3>
+              <p className="text-xs text-[#cbd5e1]">
                 Sinkronkan perubahan profil seketika ke pengunjung publik.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition"
+            className="p-1.5 rounded-full text-[#cbd5e1] hover:text-[#facc15] hover:bg-white/10 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -115,16 +113,16 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
         {/* STATUS KONEKSI */}
         <div className={`p-4 rounded-2xl border flex items-center justify-between ${
           isConnected
-            ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
-            : 'bg-zinc-50 border-zinc-200 text-zinc-700'
+            ? 'bg-emerald-500/10 border-emerald-500/35 text-emerald-300'
+            : 'bg-[#0f172a] border-[#818cf8]/25 text-[#cbd5e1]'
         }`}>
           <div className="flex items-center gap-2.5">
-            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'}`}></div>
+            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]' : 'bg-slate-500'}`}></div>
             <div>
-              <p className="text-xs font-bold">
+              <p className="text-xs font-bold text-white">
                 {isConnected ? 'Terhubung ke Cloud Firestore' : 'Belum Terhubung ke Database'}
               </p>
-              <p className="text-[11px] opacity-80">
+              <p className="text-[11px] opacity-85">
                 {isConnected
                   ? 'Data Firestore siap disinkronkan secara aman.'
                   : 'Publik masih membaca data lokal/baku bawaan.'}
@@ -134,7 +132,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
           {isConnected && (
             <button
               onClick={handleDisconnect}
-              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-100/60 transition"
+              className="px-3 py-1 rounded-full text-xs font-semibold text-rose-300 border border-[#e11d48]/40 hover:bg-[#e11d48]/20 transition"
             >
               Putuskan
             </button>
@@ -142,16 +140,16 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
         </div>
 
         {/* STATUS AUTH ADMIN */}
-        <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+        <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs ${
           currentUser
-            ? 'bg-emerald-50/60 border-emerald-200 text-emerald-900'
-            : 'bg-amber-50 border-amber-200 text-amber-900'
+            ? 'bg-[#0f172a] border-[#facc15]/40 text-[#facc15]'
+            : 'bg-[#e11d48]/10 border-[#e11d48]/40 text-rose-200'
         }`}>
           <div className="flex items-center gap-2">
             {currentUser ? (
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <ShieldCheck className="w-4 h-4 text-[#facc15]" />
             ) : (
-              <ShieldAlert className="w-4 h-4 text-amber-600" />
+              <ShieldAlert className="w-4 h-4 text-[#e11d48]" />
             )}
             <span>
               {currentUser
@@ -166,7 +164,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
                 onClose();
                 onOpenAuth();
               }}
-              className="px-2.5 py-1 rounded-lg bg-amber-500 text-white font-bold hover:bg-amber-600 transition"
+              className="px-3 py-1 rounded-full bg-[#facc15] text-[#070a14] font-bold hover:bg-[#fde047] transition"
             >
               Login
             </button>
@@ -176,7 +174,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
         {/* FORM INPUT CONFIG */}
         <form onSubmit={handleSaveConfig} className="space-y-3">
           <div>
-            <label className="block text-xs font-bold text-zinc-800 mb-1">
+            <label className="block text-xs font-bold text-[#38bdf8] mb-1">
               Konfigurasi Firebase:
             </label>
             <textarea
@@ -184,7 +182,7 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
               value={configText}
               onChange={(e) => setConfigText(e.target.value)}
               placeholder={`{\n  "apiKey": "AIzaSy...",\n  "authDomain": "projek-anda.firebaseapp.com",\n  "projectId": "projek-anda",\n  "storageBucket": "projek-anda.appspot.com",\n  "messagingSenderId": "...",\n  "appId": "..."\n}`}
-              className="w-full p-3 rounded-xl border border-zinc-300 text-xs font-mono bg-zinc-50 focus:bg-white focus:outline-none focus:border-amber-500 transition"
+              className="w-full p-3 rounded-xl border border-[#818cf8]/30 text-xs font-mono bg-[#0f172a] text-[#cbd5e1] focus:text-white focus:outline-none focus:border-[#facc15] transition"
             />
           </div>
 
@@ -192,14 +190,14 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100 transition"
+              className="ghost-pill-btn px-4 py-2 text-xs font-semibold text-[#cbd5e1]"
             >
               Tutup
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm disabled:opacity-50"
+              className="px-5 py-2.5 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs font-bold flex items-center gap-1.5 transition shadow-[0_0_15px_rgba(250,204,21,0.3)] disabled:opacity-50"
             >
               {saving ? (
                 <>
@@ -208,8 +206,8 @@ export default function FirebaseModal({ isOpen, onClose, currentState, showToast
                 </>
               ) : (
                 <>
-                  <Check className="w-4 h-4" />
-                  <span>Simpan Konfigurasi</span>
+                  <Check className="w-4 h-4 stroke-[2.5]" />
+                  <span>Simpan & Sinkronkan</span>
                 </>
               )}
             </button>

@@ -1,5 +1,15 @@
 export const AURORA_PRESETS = [
   {
+    id: 'aurora-maghrib',
+    name: 'Maghrib Twilight (Opikz)',
+    class: 'aurora-maghrib',
+    textColor: '#FFFFFF',
+    cardBgColor: 'rgba(15, 23, 42, 0.80)',
+    cardTextColor: '#FFFFFF',
+    previewGradient: 'linear-gradient(180deg, #070a14 0%, #131129 50%, #1f1430 100%)',
+    badge: 'SIGNATURE',
+  },
+  {
     id: 'aurora-northern',
     name: 'Northern Lights',
     class: 'aurora-northern',
@@ -46,25 +56,55 @@ export const AURORA_PRESETS = [
   },
 ];
 
+export const PARTICLE_PRESETS = [
+  {
+    id: 'cyber-fireflies',
+    name: 'Cyber Fireflies',
+    desc: 'Partikel emas (#facc15) & sky blue (#38bdf8) melayang',
+  },
+  {
+    id: 'neural-matrix',
+    name: 'Neural Matrix',
+    desc: 'Jaringan titik konstelasi sci-fi saling terhubung',
+  },
+  {
+    id: 'starfield',
+    name: 'Maghrib Starfield',
+    desc: 'Bintang senja berkedip lembut di latar belakang',
+  },
+  {
+    id: 'none',
+    name: 'Tanpa Partikel',
+    desc: 'Latar bersih tanpa animasi partikel',
+  },
+];
+
 export const DEFAULT_STATE = {
   slug: 'lutfi',
   profile: {
     name: 'Lutfi Alhamsyah',
-    role: 'Informatics Engineering & AI Builder',
+    role: 'IT Project Manager | IT Cloud | Informatics Student',
     bio: 'Membangun aplikasi web, sistem AI, dan berbagi catatan seputar teknologi.',
     avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Lutfi',
   },
   appearance: {
     bgMode: 'aurora', // 'aurora' | 'image' | 'solid'
-    auroraClass: 'aurora-northern',
+    auroraClass: 'aurora-maghrib',
     customImageData: '',
     imageOverlayOpacity: 45,
     imageBlurPx: 4,
-    solidBgColor: '#090D16',
+    solidBgColor: '#070a14',
     textColor: '#FFFFFF',
-    cardBgColor: 'rgba(255, 255, 255, 0.12)',
+    cardBgColor: 'rgba(15, 23, 42, 0.80)',
     cardTextColor: '#FFFFFF',
-    buttonStyle: 'glass',
+    buttonStyle: 'pill-ghost', // 'pill-ghost' | 'glass'
+    particleEffect: 'cyber-fireflies', // 'cyber-fireflies' | 'neural-matrix' | 'starfield' | 'none'
+    enableTypewriter: true,
+    enableKineticHeader: false,
+    enableTechBrackets: true,
+    enableMottoTicker: true,
+    mottoText: 'HIDUPLAH SEPERTI LARRY • THE SAGE & THE CREATOR • ANALITIS • VISIONER • EKSEKUTOR',
+    showOrixBadge: true,
   },
   links: [
     {

@@ -10,9 +10,9 @@ import AuthModal from './components/AuthModal';
 import ExportModal from './components/ExportModal';
 import FirebaseModal from './components/FirebaseModal';
 import Toast from './components/Toast';
-import { ShieldAlert, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { isFirebaseConfigured } from './firebase/config';
-import { fetchBioFromCloud, saveBioToCloud, subscribeBioFromCloud } from './firebase/bioService';
+import { saveBioToCloud, subscribeBioFromCloud } from './firebase/bioService';
 import { subscribeFirebaseUser } from './firebase/authService';
 
 export default function App() {
@@ -91,6 +91,11 @@ export default function App() {
           setState((prev) => ({
             ...prev,
             ...cloudData,
+            appearance: {
+              ...DEFAULT_STATE.appearance,
+              ...(prev.appearance || {}),
+              ...(cloudData.appearance || {}),
+            },
           }));
           isInitialCloudSyncDone.current = true;
         }
@@ -104,7 +109,7 @@ export default function App() {
   // KEAMANAN: HANYA berjalan jika Admin TERAUTENTIKASI (Logged In)
   useEffect(() => {
     if (!isFirebaseConfigured() || !isInitialCloudSyncDone.current) return;
-    if (!currentUser) return; // Pengunjung tanpa login tidak akan bisa memicu penulisan ke cloud
+    if (!currentUser) return;
 
     const timer = setTimeout(() => {
       saveBioToCloud(state, state.slug || 'lutfi')
@@ -188,9 +193,9 @@ export default function App() {
     );
   }
 
-  // MODE STUDIO EDITOR
+  // MODE STUDIO EDITOR (MAGHRIB TWILIGHT BRAND IDENTITY - 2 COLUMN DESKTOP LAYOUT)
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4F3EF] selection:bg-zinc-900 selection:text-white">
+    <div className="min-h-screen flex flex-col maghrib-editor-bg text-white selection:bg-[#facc15] selection:text-[#070a14]">
       {/* NAVBAR */}
       <Navbar
         activeTab={activeTab}
@@ -205,27 +210,29 @@ export default function App() {
         setViewMode={setViewMode}
       />
 
-      {/* WORKSPACE */}
+      {/* WORKSPACE (2-Kolom Desktop: Sisi Kiri Teks/Logika, Sisi Kanan Visual/Grafik) */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* LEFT COLUMN: EDITORS */}
         <div className="lg:col-span-7 space-y-6">
           {/* BANNER KEAMANAN: Jika belum login sebagai Admin */}
           {!currentUser && (
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-300 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div className="maghrib-glass tech-corner-box p-4 rounded-2xl border border-[#facc15]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[#facc15]/15 text-[#facc15] border border-[#facc15]/30 flex items-center justify-center shrink-0">
                   <Lock className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold">Mode Pratinjau Editor (Tamu / Belum Login)</p>
-                  <p className="text-[11px] text-amber-700 leading-tight">
+                  <p className="text-xs font-bold text-[#facc15]">
+                    Mode Pratinjau Editor (Tamu / Belum Login)
+                  </p>
+                  <p className="text-[11px] text-[#cbd5e1] leading-tight mt-0.5">
                     Perubahan Anda hanya tersimpan lokal di browser ini. Masuk dengan akun Firebase untuk memperbarui link bio publik.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs shrink-0 self-end sm:self-auto"
+                className="px-4 py-2 rounded-full bg-[#facc15] hover:bg-[#fde047] text-[#070a14] text-xs font-bold transition shadow-[0_0_12px_rgba(250,204,21,0.3)] shrink-0 self-end sm:self-auto"
               >
                 Login Admin
               </button>
